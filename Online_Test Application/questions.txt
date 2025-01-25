@@ -1,0 +1,1408 @@
+Math
+1
+37 * 3 = ?
+111
+123
+117
+129
+A
+Math
+2
+12345679 * 9 = ?
+97654321
+123456789
+111111111
+102345679
+C
+Math
+1
+1 + 2 + 3 + 4 + 5 + 6 + 7 + 8 + 9 = ?
+55
+45
+100
+10
+B
+Math
+1
+6 / 3 * 2 = ?
+1
+9
+6
+4
+D
+Math
+2
+Điền số thích hợp vào dãy: 1, 1, 2, 3, 5, 8, 13, ...
+14
+15
+17
+21
+D
+Geography
+1
+Đâu là thủ đô của Pháp?
+Rome
+Berlin
+Paris
+London
+C
+Geography
+2
+Đất nước nào ở châu Phi?
+Ấn Độ
+Ai Cập
+Venezuela
+Moldova
+B
+History
+2
+Chiến tranh thế giới thứ 2 kết thúc vào năm nào?
+1945
+1939
+1914
+1918
+A
+History
+3
+Hiệp định nào chấm dứt chế độ thực dân Pháp tại Đông Dương?
+Paris
+Geneva
+Tilsit
+Versailles
+B
+Literature
+2
+Ai là tác giả của Tắt đèn?
+Nam Cao
+Ngô Tất Tố
+Tô Hoài
+Nguyễn Tuân
+B
+Math
+1
+10 + 20 = ?
+30
+40
+50
+60
+A
+Math
+1
+15 * 2 = ?
+25
+30
+35
+40
+B
+Math
+2
+72 / 8 = ?
+8
+9
+10
+11
+B
+Math
+2
+80 - 15 = ?
+55
+60
+65
+70
+A
+Math
+3
+125 * 4 = ?
+480
+500
+510
+520
+B
+Math
+3
+144 / 12 = ?
+11
+12
+13
+14
+B
+Math
+2
+50 * 6 = ?
+300
+350
+400
+450
+A
+Math
+1
+8 + 8 = ?
+14
+15
+16
+17
+C
+Math
+1
+5 * 5 = ?
+20
+25
+30
+35
+B
+Math
+3
+196 / 14 = ?
+13
+14
+15
+16
+B
+Geography
+1
+Which is the capital city of France?
+Paris
+Rome
+Berlin
+Madrid
+A
+Geography
+2
+Mount Everest is located in which country?
+India
+Nepal
+China
+Pakistan
+B
+Geography
+1
+The Amazon River is located in which continent?
+Asia
+Europe
+Africa
+South America
+D
+Geography
+2
+Which ocean is the largest?
+Atlantic Ocean
+Indian Ocean
+Arctic Ocean
+Pacific Ocean
+D
+Geography
+2
+The Sahara Desert is located in which continent?
+Africa
+Asia
+Australia
+South America
+A
+Geography
+1
+Which country has the most islands?
+Canada
+Sweden
+Norway
+Indonesia
+B
+Geography
+2
+The Great Barrier Reef is located off the coast of which country?
+Australia
+New Zealand
+South Africa
+USA
+A
+Geography
+3
+Which river is the longest in Europe?
+Danube
+Thames
+Volga
+Rhine
+C
+Geography
+1
+Which is the largest country in the world by area?
+USA
+Russia
+Canada
+China
+B
+Geography
+3
+The capital of Brazil is?
+Rio de Janeiro
+Sao Paulo
+Brasília
+Salvador
+C
+History
+1
+Who was the first president of the United States?
+George Washington
+Thomas Jefferson
+Abraham Lincoln
+John Adams
+A
+History
+1
+The Declaration of Independence was signed in which year?
+1776
+1789
+1800
+1812
+A
+History
+2
+Who was the first emperor of Rome?
+Julius Caesar
+Augustus
+Nero
+Caligula
+B
+History
+2
+Which year did the Titanic sink?
+1912
+1913
+1914
+1920
+A
+History
+3
+The Battle of Hastings took place in which year?
+1066
+1088
+1100
+1200
+A
+History
+1
+Who was the first woman to fly solo across the Atlantic Ocean?
+Amelia Earhart
+Jacqueline Cochran
+Bessie Coleman
+Sally Ride
+A
+History
+2
+World War II ended in which year?
+1945
+1940
+1939
+1950
+A
+History
+2
+Which country was first to land on the moon?
+USSR
+China
+USA
+India
+C
+History
+3
+The ancient Egyptian pyramids were built during which period?
+Old Kingdom
+Middle Kingdom
+New Kingdom
+Late Period
+A
+History
+1
+Who was the leader of the Soviet Union during World War II?
+Lenin
+Stalin
+Khrushchev
+Gorbachev
+B
+English
+1
+Which word is an antonym of 'happy'?
+Sad
+Joyful
+Angry
+Excited
+A
+English
+1
+Which of these is a synonym for 'quick'?
+Slow
+Fast
+Heavy
+Tall
+B
+English
+2
+What is the past tense of 'go'?
+Gone
+Went
+Going
+Go
+B
+English
+2
+Which of these words is a noun?
+Run
+Quickly
+Dog
+Beautiful
+C
+English
+3
+Which of these sentences is grammatically correct?
+She going to the store
+She goes to the store
+She going store
+She gone to store
+B
+English
+3
+Which is the correct plural form of 'child'?
+Childs
+Children
+Childes
+Childrens
+B
+English
+2
+Choose the correct sentence:
+I can sings well
+I can sing well
+I sings well
+I singing well
+B
+English
+1
+Which word is an adverb?
+Quickly
+Quiet
+Dog
+Happy
+A
+English
+3
+Which of these is a complex sentence?
+I like pizza
+I like pizza and pasta
+I like pizza because it's delicious
+I like pizza, but I don't like pasta
+C
+English
+2
+Which of these words is an adjective?
+Run
+Quickly
+Tall
+Swim
+C
+Math
+1
+10 + 5 = ?
+12
+13
+14
+15
+D
+Math
+1
+15 - 3 = ?
+10
+11
+12
+13
+A
+Math
+1
+5 * 3 = ?
+13
+14
+15
+16
+C
+Math
+1
+20 / 4 = ?
+4
+5
+6
+7
+B
+Math
+1
+8 + 7 = ?
+14
+15
+16
+17
+B
+Math
+1
+9 * 2 = ?
+16
+17
+18
+19
+C
+Math
+1
+6 + 4 = ?
+9
+10
+11
+12
+B
+Math
+1
+18 - 5 = ?
+12
+13
+14
+15
+B
+Math
+1
+7 * 2 = ?
+12
+13
+14
+15
+C
+Math
+1
+14 / 7 = ?
+1
+2
+3
+4
+B
+Math
+1
+3 + 9 = ?
+10
+11
+12
+13
+C
+Math
+1
+2 * 5 = ?
+9
+10
+11
+12
+B
+Math
+1
+16 - 4 = ?
+11
+12
+13
+14
+B
+Math
+1
+12 + 6 = ?
+16
+17
+18
+19
+C
+Math
+1
+4 * 6 = ?
+20
+24
+25
+30
+B
+Math
+1
+1+1
+2
+3
+4
+5
+A
+English
+1
+Which word is an adverb?
+Quickly
+Quiet
+Dog
+Happy
+A
+English
+1
+Which word is a verb?
+Run
+Book
+Chair
+Quickly
+A
+English
+1
+Which word is a noun?
+Beautiful
+Laugh
+Apple
+Slowly
+C
+English
+1
+Which word is an adjective?
+Quickly
+Chair
+Tall
+Dog
+C
+English
+1
+Which word is a pronoun?
+He
+Slowly
+Book
+Walk
+A
+English
+1
+Which word is a conjunction?
+And
+Run
+Green
+Quickly
+A
+English
+1
+Which word is a preposition?
+On
+Dog
+Quickly
+Eat
+A
+English
+1
+Which word is a subject?
+She
+Quickly
+Jump
+Tall
+A
+English
+1
+Which word is an object?
+Ball
+He
+Beautiful
+Quietly
+A
+English
+1
+Which word is a determiner?
+The
+Run
+Quickly
+Dog
+A
+English
+1
+Which word is a singular noun?
+Cat
+Cats
+Dogs
+Quickly
+A
+English
+1
+Which word is a plural noun?
+Books
+Book
+Slowly
+Dance
+A
+English
+1
+Which word is an interjection?
+Wow
+Quickly
+Apple
+Jump
+A
+English
+1
+Which word is a countable noun?
+Car
+Water
+Milk
+Air
+A
+English
+1
+Which word is an uncountable noun?
+Coffee
+Dog
+Chair
+Quickly
+A
+English
+1
+Which word is an infinitive?
+To run
+Running
+Jumping
+Quickly
+A
+English
+1
+Which word is a past tense verb?
+Walked
+Walk
+Running
+Quickly
+A
+English
+1
+Which word is a comparative adjective?
+Taller
+Tall
+Slowly
+Fast
+A
+English
+1
+Which word is a superlative adjective?
+Fastest
+Fast
+Slowly
+Dog
+A
+English
+1
+Which word is a coordinating conjunction?
+But
+Quickly
+Tall
+Eat
+A
+Science
+3
+Định luật bảo toàn năng lượng nói gì?
+Năng lượng có thể được tạo ra
+Năng lượng có thể bị phá hủy
+Năng lượng không thể tạo ra hoặc phá hủy, chỉ có thể chuyển đổi
+Năng lượng chỉ có thể chuyển thành nhiệt
+C
+Science
+3
+Số nguyên tử của cacbon là bao nhiêu?
+4
+5
+6
+7
+C
+Geography
+1
+Châu lục nào được mệnh danh là "Xứ sở Mặt Trời mọc"?
+Châu Phi
+Châu Á
+Châu Âu
+Nam Mỹ
+B
+Geography
+1
+Thủ đô của Úc là gì?
+Sydney
+Melbourne
+Canberra
+Brisbane
+C
+Geography
+1
+Sông dài nhất thế giới là sông nào?
+Amazon
+Nile
+Dương Tử
+Mississippi
+B
+Geography
+2
+Dãy núi nào ngăn cách châu Âu và châu Á?
+Alps
+Himalayas
+Andes
+Ural
+D
+Geography
+2
+Tên của sa mạc ở Bắc Phi là gì?
+Gobi
+Sahara
+Atacama
+Arabian
+B
+Geography
+2
+Đại dương nào nằm giữa châu Phi và châu Úc?
+Đại Tây Dương
+Thái Bình Dương
+Bắc Băng Dương
+Ấn Độ Dương
+D
+Geography
+3
+Ngọn núi cao nhất thế giới là ngọn núi nào?
+K2
+Kangchenjunga
+Everest
+Lhotse
+C
+Geography
+3
+Quốc gia nào được mệnh danh là "Đất nước của nghìn hồ"?
+Phần Lan
+Thụy Điển
+Na Uy
+Đan Mạch
+A
+Geography
+3
+Tên của hệ thống rạn san hô lớn nhất thế giới là gì?
+Rạn san hô Great Barrier
+Rạn san hô Belize Barrier
+Rạn san hô Biển Đỏ
+Rạn san hô Florida Keys
+A
+Geography
+3
+Hẻm núi Grand Canyon nằm ở đâu?
+Arizona
+Utah
+Nevada
+California
+A
+History
+1
+Ai là Tổng thống đầu tiên của Hoa Kỳ?
+George Washington
+Thomas Jefferson
+John Adams
+Abraham Lincoln
+A
+History
+1
+Chiến tranh thế giới thứ nhất bắt đầu năm nào?
+1914
+1918
+1939
+1945
+A
+History
+1
+Ai là người vẽ bức tranh Mona Lisa?
+Van Gogh
+Picasso
+Leonardo da Vinci
+Michelangelo
+C
+History
+2
+Tên con tàu chở những người hành hương đến Mỹ là gì?
+Santa Maria
+Mayflower
+Victory
+Endeavor
+B
+History
+2
+Nền văn minh cổ đại nào đã xây dựng các kim tự tháp ở Giza?
+La Mã
+Hy Lạp
+Ai Cập
+Ba Tư
+C
+History
+2
+Chiến tranh Lạnh là gì?
+Một cuộc chiến có nhiều băng
+Một cuộc chiến giữa Mỹ và Liên Xô
+Một cuộc chiến không có vũ khí
+Một cuộc chiến giữa Pháp và Anh
+B
+History
+3
+Ai là người đầu tiên đi bộ trên Mặt Trăng?
+Neil Armstrong
+Buzz Aldrin
+Yuri Gagarin
+Alan Shepard
+A
+History
+3
+Bức tường Berlin sụp đổ năm nào?
+1987
+1989
+1991
+1993
+B
+History
+3
+Cuộc chiến nào đã xảy ra giữa miền Bắc và miền Nam Hoa Kỳ?
+Cách mạng Hoa Kỳ
+Chiến tranh thế giới thứ nhất
+Nội chiến Hoa Kỳ
+Chiến tranh Việt Nam
+C
+History
+3
+Ai là người lãnh đạo phong trào độc lập Ấn Độ?
+Mahatma Gandhi
+Jawaharlal Nehru
+Indira Gandhi
+Sardar Patel
+A
+Literature
+1
+Ai là tác giả của "Romeo và Juliet"?
+Charles Dickens
+William Shakespeare
+Jane Austen
+Ernest Hemingway
+B
+Literature
+1
+Ai là tác giả của "Giết con chim nhại"?
+Harper Lee
+Mark Twain
+F. Scott Fitzgerald
+John Steinbeck
+A
+Literature
+1
+Ai là tác giả của "Đại gia Gatsby"?
+Mark Twain
+F. Scott Fitzgerald
+Ernest Hemingway
+William Faulkner
+B
+Literature
+2
+"Chúa tể những chiếc nhẫn" thuộc thể loại truyện gì?
+Lãng mạn
+Hài kịch
+Giả tưởng
+Kinh dị
+C
+Literature
+2
+Nhân vật chính trong "Hamlet" là ai?
+Macbeth
+Hamlet
+Othello
+Lear
+B
+Literature
+2
+Cuốn sách nào có nhân vật tên là Harry Potter?
+Người Hobbit
+Đấu trường sinh tử
+Harry Potter và hòn đá phù thủy
+Percy Jackson
+C
+Literature
+3
+Thuật ngữ văn học nào chỉ sự so sánh sử dụng từ "như" hoặc "là"?
+Ẩn dụ
+So sánh
+Nhân hóa
+Nói quá
+B
+Literature
+3
+Thuật ngữ văn học nào chỉ việc gán phẩm chất của con người cho vật vô tri?
+Ẩn dụ
+So sánh
+Nhân hóa
+Nói quá
+C
+Literature
+3
+Ai là tác giả của "1984"?
+Aldous Huxley
+George Orwell
+Ray Bradbury
+Philip K. Dick
+B
+Literature
+3
+Thơ sonnet là gì?
+Một bài thơ 10 dòng
+Một bài thơ 14 dòng
+Một bài thơ 16 dòng
+Một bài thơ 12 dòng
+B
+Computer
+1
+CPU là viết tắt của cụm từ nào?
+Central Processing Unit
+Computer Processing Unit
+Central Program Unit
+Computer Program Unit
+A
+Computer
+1
+RAM là viết tắt của cụm từ nào?
+Random Access Memory
+Read Only Memory
+Random Application Memory
+Read Application Memory
+A
+Computer
+1
+HTML là viết tắt của cụm từ nào?
+Hyper Text Markup Language
+Hyperlinks and Text Markup Language
+Home Tool Markup Language
+Hyper Text Management Language
+A
+Computer
+2
+Địa chỉ IP là gì?
+Tên máy tính
+Địa chỉ vật lý của máy tính
+Địa chỉ số duy nhất của máy tính
+Tốc độ internet của máy tính
+C
+Computer
+2
+Hệ điều hành là gì?
+Phần cứng của máy tính
+Phần mềm quản lý phần cứng và phần mềm của máy tính
+Một trò chơi máy tính
+Một loại bộ nhớ máy tính
+B
+Computer
+2
+URL là gì?
+Mã code của website
+Địa chỉ website
+Phần cứng của máy tính
+Một loại phần mềm
+B
+Computer
+3
+API là viết tắt của cụm từ nào?
+Application Programming Interface
+Advanced Program Interface
+Application Protocol Interface
+Advanced Protocol Interface
+A
+Computer
+3
+Tường lửa là gì?
+Một bộ phận máy tính
+Một phần mềm an ninh
+Một bộ nhớ máy tính
+Một loại trang web
+B
+Computer
+3
+Cơ sở dữ liệu là gì?
+Một nơi để lưu trữ tệp
+Một tập hợp dữ liệu có tổ chức
+Một công cụ để tạo trang web
+Một mạng máy tính
+B
+Computer
+3
+HTTP là viết tắt của cụm từ nào?
+Hyper Transfer Text Protocol
+Hyper Text Transfer Protocol
+Hypertext Transfer Technology
+Hyper Technology Transfer Protocol
+B
+Art
+1
+Ai là người vẽ bức tranh "Đêm đầy sao"?
+Leonardo da Vinci
+Vincent van Gogh
+Pablo Picasso
+Claude Monet
+B
+Art
+1
+Màu cơ bản là màu gì?
+Đỏ, Xanh dương, Vàng
+Xanh lá cây, Xanh dương, Vàng
+Đỏ, Xanh lá cây, Xanh dương
+Đỏ, Cam, Vàng
+A
+Art
+1
+Đâu là một công cụ được các nhà điêu khắc sử dụng?
+Bút chì
+Cọ vẽ
+Đục
+Tẩy
+C
+Art
+2
+Tranh fresco là gì?
+Một loại tranh vẽ trên thạch cao ướt
+Một loại bản vẽ trên giấy
+Một tác phẩm điêu khắc làm bằng đất sét
+Một loại đồ gốm
+A
+Art
+2
+Tranh cắt dán (collage) là gì?
+Một bức tranh làm bằng nhiều chất liệu
+Một tác phẩm điêu khắc làm bằng kim loại
+Một tác phẩm nghệ thuật được tạo ra bằng cách dán nhiều vật liệu khác nhau
+Một tác phẩm nghệ thuật sử dụng nước
+C
+Art
+2
+Phấn màu là gì?
+Một loại phấn mềm có màu
+Một loại sơn
+Một loại vải canvas
+Một loại giấy
+A
+Art
+3
+Phong trào nghệ thuật nào được biết đến với việc sử dụng màu sắc tươi sáng và hình dạng méo mó?
+Chủ nghĩa hiện thực
+Chủ nghĩa ấn tượng
+Chủ nghĩa siêu thực
+Chủ nghĩa biểu hiện
+D
+Art
+3
+Tỷ lệ vàng là gì?
+Một tỷ lệ toán học để tạo ra các hình thức thẩm mỹ
+Một tỷ lệ sử dụng màu sắc trong một bức tranh
+Một tỷ lệ cho lượng sơn cần thiết
+Một tỷ lệ để xác định giá của tác phẩm nghệ thuật
+A
+Art
+3
+Chiaroscuro là gì?
+Một kỹ thuật sử dụng màu sắc đậm
+Một kỹ thuật sử dụng sự tương phản mạnh mẽ giữa ánh sáng và bóng tối
+Một kỹ thuật để tạo ra phối cảnh
+Một kỹ thuật để tạo ra các hình thức trừu tượng
+B
+Art
+3
+Phong trào nghệ thuật nào tập trung vào các đối tượng hàng ngày và văn hóa đại chúng?
+Phục hưng
+Ba-rốc
+Nghệ thuật Pop
+Trừu tượng
+C
+English 
+3
+Who are you ?
+Chat , is this real ?
+Nah I'd win 
+Nuh Uh 
+Im Khang 
+D
+English
+1
+Which word is an adverb?
+Quickly
+Quiet
+Dog
+Happy
+A
+Math
+1
+10 + 5 = ?
+12
+13
+14
+15
+D
+Math
+1
+15 - 3 = ?
+10
+11
+12
+13
+A
+Math
+1
+5 * 3 = ?
+13
+14
+15
+16
+C
+Math
+1
+20 / 4 = ?
+4
+5
+6
+7
+B
+Math
+1
+8 + 7 = ?
+14
+15
+16
+17
+B
+Math
+1
+9 * 2 = ?
+16
+17
+18
+19
+C
+Math
+1
+6 + 4 = ?
+9
+10
+11
+12
+B
+Math
+1
+18 - 5 = ?
+12
+13
+14
+15
+B
+Math
+1
+7 * 2 = ?
+12
+13
+14
+15
+C
+Math
+1
+14 / 7 = ?
+1
+2
+3
+4
+B
+Math
+1
+3 + 9 = ?
+10
+11
+12
+13
+C
+Math
+1
+2 * 5 = ?
+9
+10
+11
+12
+B
+Math
+1
+16 - 4 = ?
+11
+12
+13
+14
+B
+Math
+1
+12 + 6 = ?
+16
+17
+18
+19
+C
+Math
+1
+4 * 6 = ?
+20
+24
+25
+30
+B
+Math
+1
+1+1
+2
+3
+4
+5
+A
+English
+1
+Which word is an adverb?
+Quickly
+Quiet
+Dog
+Happy
+A
+English
+1
+Which word is a verb?
+Run
+Book
+Chair
+Quickly
+A
+English
+1
+Which word is a noun?
+Beautiful
+Laugh
+Apple
+Slowly
+C
+English
+1
+Which word is an adjective?
+Quickly
+Chair
+Tall
+Dog
+C
+English
+1
+Which word is a pronoun?
+He
+Slowly
+Book
+Walk
+A
+English
+1
+Which word is a conjunction?
+And
+Run
+Green
+Quickly
+A
+English
+1
+Which word is a preposition?
+On
+Dog
+Quickly
+Eat
+A
+English
+1
+Which word is a subject?
+She
+Quickly
+Jump
+Tall
+A
+English
+1
+Which word is an object?
+Ball
+He
+Beautiful
+Quietly
+A
+English
+1
+Which word is a determiner?
+The
+Run
+Quickly
+Dog
+A
+English
+1
+Which word is a singular noun?
+Cat
+Cats
+Dogs
+Quickly
+A
+English
+1
+Which word is a plural noun?
+Books
+Book
+Slowly
+Dance
+A
+English
+1
+Which word is an interjection?
+Wow
+Quickly
+Apple
+Jump
+A
+English
+1
+Which word is a countable noun?
+Car
+Water
+Milk
+Air
+A
+English
+1
+Which word is an uncountable noun?
+Coffee
+Dog
+Chair
+Quickly
+A
+English
+1
+Which word is an infinitive?
+To run
+Running
+Jumping
+Quickly
+A
+English
+1
+Which word is a past tense verb?
+Walked
+Walk
+Running
+Quickly
+A
+English
+1
+Which word is a comparative adjective?
+Taller
+Tall
+Slowly
+Fast
+A
+English
+1
+Which word is a superlative adjective?
+Fastest
+Fast
+Slowly
+Dog
+A
+English
+1
+Which word is a coordinating conjunction?
+But
+Quickly
+Tall
+Eat
+A
