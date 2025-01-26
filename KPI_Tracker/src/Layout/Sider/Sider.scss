@@ -1,0 +1,12 @@
+.ant-drawer-body {
+  padding: 0!important; /* Loại bỏ padding của drawer body */
+}
+
+.ant-menu-dark .ant-menu-item-selected {
+  background-color: #1814F3!important;
+}
+
+.ant-menu-light .ant-menu-item-selected {
+  background-color: #1814F3!important;
+  color: #ffffff;
+}

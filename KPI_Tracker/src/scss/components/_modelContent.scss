@@ -1,0 +1,32 @@
+.ant-modal-wrap {
+    .ant-modal {
+        padding: 0;
+    }
+    .ant-modal .ant-modal-title,
+    .form-row-title {
+        margin-bottom: 20px;
+        font-size: 2.4rem;
+        color: #010c80;
+        font-weight: 700;
+        line-height: 154.167%;
+    }
+
+    .ant-form-vertical
+        .ant-form-item-label
+        > label {
+        font-size: 14px;
+        color: #3b3d41;
+        font-weight: 700;
+        line-height: 178.571%;
+    }
+
+    .form-row-title {
+        margin-top: 20px;
+        display: inline-block;
+    }
+
+    .ant-table-content {
+        border: 1px solid #d9d9d9;
+        border-radius: 6px;
+    }
+}

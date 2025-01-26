@@ -1,0 +1,105 @@
+@use "../abstracts";
+
+.manage-kpi {
+    padding: 20px 0;
+    h1 {
+        color: #010c80;
+        font-size: 3.2rem;
+        font-weight: 700;
+    }
+
+    .kpi-list {
+        display: flex;
+        max-height: 100%;
+        background-color: #fff;
+        overflow-x: auto;
+        padding: 15px;
+        border-radius: 15px;
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+    .kpi-item {
+        display: flex;
+        flex-direction: column;
+        padding: 15px;
+        border: 1px solid #eee;
+        border-radius: 15px;
+        flex: 1;
+        // width: 25%;
+        @include abstracts.screen(md) {
+            width: calc(100vw - 60px);
+        }
+        &-top {
+            @include abstracts.screen(md) {
+                width: calc(100vw - 90px);
+            }
+        }
+        &-title {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: #010c80;
+            margin-bottom: 10px;
+        }
+        hr {
+            color: #1814f2;
+            background-color: #1814f2;
+            height: 2px;
+            border-radius: 2px;
+            border: none;
+            width: 100%;
+        }
+        &-bottom {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 10px;
+            width: 100%;
+            // button {
+            //     cursor: pointer;
+            //     padding: 5px 16px;
+            //     background-color: #1814f2;
+            //     color: #fff;
+            //     font-weight: 600;
+            //     border-radius: 6px;
+            //     transition: 0.3s ease;
+            //     &:hover {
+            //         background-color: #3532e8;
+            //     }
+            // }
+        }
+        &-act {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            .kpi-item-edit {
+                transition: 0.3s ease;
+                cursor: pointer;
+                &:hover {
+                    filter: brightness(0) saturate(100%) invert(9%) sepia(97%) saturate(7498%) hue-rotate(247deg) brightness(91%) contrast(110%);
+                }
+            }
+            .kpi-item-delete {
+                transition: 0.3s ease;
+                cursor: pointer;
+                &:hover {
+                    filter: brightness(0) saturate(100%) invert(28%) sepia(86%) saturate(6936%) hue-rotate(355deg) brightness(99%) contrast(123%);
+                }
+            }
+            svg {
+                width: 1.6rem;
+                height: 1.6rem;
+            }
+        }
+    }
+    .ant-btn {
+        background-color: #1814f2 !important;
+        span {
+            color: #FFF !important;
+        }
+    }
+}
+
+:where(.css-dev-only-do-not-override-1okl62o).ant-tabs .ant-tabs-tab {
+    cursor: pointer !important;
+}

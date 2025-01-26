@@ -1,0 +1,302 @@
+@use "../abstracts";
+
+.dashboard {
+    min-height: calc(100vh - 70px);
+    background-color: #f5f6fa;
+    padding: 20px 20px 0 20px;
+
+    .ant-row {
+        margin-bottom: 20px;
+    }
+
+    &-title {
+        // margin-bottom: ;
+        color: #010c80;
+        font-size: 3.2rem;
+        font-weight: 700;
+    }
+
+    &-hello {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        padding: 20px;
+        border-radius: 15px;
+        background-color: #fff;
+        box-shadow: 0 0px 6px rgba(0, 0, 0, 0.2);
+
+        div {
+            width: 60%;
+            p {
+                margin-bottom: 10px;
+                font-size: 1.6rem;
+                strong {
+                    font-weight: 600;
+                    color: green;
+                }
+            }
+            p:first-child {
+                color: #1814f2;
+                font-size: 2rem;
+                font-weight: 700;
+                line-height: normal;
+            }
+        }
+        img {
+            width: 100px;
+            height: 100px;
+        }
+    }
+
+    .slide-name {
+        margin-bottom: 10px;
+        color: #1814f2;
+        font-size: 2rem;
+        font-weight: 700;
+        line-height: normal;
+        // margin-left: -20px;
+    }
+
+    .slide-container {
+        display: flex;
+
+        gap: 40px;
+    }
+
+    .kpi-diagram {
+        height: 300px;
+        background-color: #fff;
+        box-shadow: 0 0px 6px rgba(0, 0, 0, 0.2);
+        border-radius: 15px;
+        padding: 20px;
+
+        padding-bottom: 50px;
+        &-title {
+            color: #1814f2;
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        canvas {
+            width: 100%; // Thay đổi từ minWidth thành width và sử dụng phần trăm hoặc vw
+            height: 300px; // Hoặc sử dụng kích thước cố định, hoặc có thể cân nhắc sử dụng phần trăm hoặc vw
+        }
+    }
+    .react-slideshow-wrapper.slide {
+        box-shadow: 0 0px 6px rgba(0, 0, 0, 0.2);
+        border-radius: 15px;
+    }
+    // .react-slideshow-container .default-nav {
+    //     // background: #eee !important;
+    // }
+
+    .dashboard-daytask {
+        height: 350px;
+        width: 100%;
+        background-color: #ffffff;
+        padding: 20px;
+        border-radius: 15px;
+        box-shadow: 0 0px 6px rgba(0, 0, 0, 0.2);
+        @include abstracts.screen(md) {
+            height: auto;
+        }
+        &-title {
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            h3 {
+                color: #1814f2;
+                font-size: 2rem;
+                font-weight: 700;
+            }
+        }
+    }
+
+    .dashboard-daytask h3 {
+        font-size: 2rem;
+        // margin-bottom: 20px;
+    }
+
+    .dashboard-list {
+        max-height: 260px;
+        overflow-y: auto;
+    }
+
+    .dashboard-list::-webkit-scrollbar {
+        width: 12px;
+    }
+
+    .dashboard-list::-webkit-scrollbar-track {
+        background-color: #f1f1f1;
+    }
+
+    .dashboard-list::-webkit-scrollbar-thumb {
+        background-color: #888;
+        border-radius: 6px;
+    }
+
+    .dashboard-list::-webkit-scrollbar-thumb:hover {
+        background-color: #555;
+    }
+
+    .dashboard-task {
+        height: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px;
+        border-radius: 10px;
+        border-bottom: 1px solid #f0f0f0;
+        margin-bottom: 2px;
+
+        .task-info {
+            display: flex;
+            align-items: center;
+            &-name {
+                width: 210px;
+                margin-right: 20px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                color: #232323;
+                font-size: 1.6rem;
+                font-weight: 500;
+                @include abstracts.screen(md) {
+                    width: 90px;
+                    margin-right: 0px;
+                }
+            }
+            .span-import {
+                @include abstracts.screen(md) {
+                    display: none;
+                }
+            }
+            img {
+                width: 20px;
+                height: 20px;
+                object-fit: contain;
+                @include abstracts.screen(md) {
+                    margin-left: 40px;
+                }
+            }
+        }
+    }
+
+    .dashboard-task:last-child {
+        border-bottom: none;
+    }
+
+    .dashboard-task .ant-checkbox-wrapper {
+        font-size: 16px;
+    }
+
+    .react-calendar__tile--hasTasks,
+    .react-calendar__tile--hasIncompletePrevTasks {
+        position: relative;
+    }
+
+    .react-calendar__tile--hasTasks::after,
+    .react-calendar__tile--hasIncompletePrevTasks::after {
+        content: "";
+        position: absolute;
+        bottom: 5px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 10px;
+        height: 4px;
+        background-color: #7549ff;
+        border-radius: 10px;
+    }
+
+    .react-calendar__tile--hasIncompletePrevTasks::after {
+        background-color: red;
+    }
+
+    .react-calendar__tile--active::after {
+        background-color: #fff !important;
+    }
+
+    .dashboard-task.completed {
+        border: 1px solid green; /* Base border */
+        background-color: #f0fff0; /* Xanh lá cây nhạt */
+    }
+
+    .custom-input-number {
+        border: none;
+        background-color: transparent;
+        width: 60px;
+        padding: 0;
+    }
+
+    .custom-input-number input {
+        border: none;
+        background-color: transparent;
+        color: black;
+        pointer-events: none;
+    }
+
+    .custom-input-number.editable input {
+        pointer-events: auto;
+        border: 1px solid #d9d9d9;
+        background-color: white;
+        color: black;
+    }
+
+    .custom-input-number input:focus {
+        outline: none;
+        box-shadow: none;
+    }
+
+    .custom-input-number input:hover {
+        background-color: transparent; /* Ensure background color does not change on hover */
+        color: black; /* Ensure text color does not change on hover */
+    }
+}
+
+.kpi-box-info {
+    display: flex;
+    flex-direction: column;
+    // align-items: center;
+    // justify-content: center;
+
+    &-title {
+        font-size: 2rem;
+        margin-bottom: 10px;
+        font-weight: 600;
+        margin-bottom: 20px;
+    }
+
+    strong {
+        color: green;
+        font-weight: 600;
+    }
+    span {
+        color: #718ebf;
+        font-size: 1.2rem;
+        font-weight: 400;
+        margin-bottom: 5px;
+    }
+
+    .task-info {
+        height: 30px;
+    }
+}
+
+:where(.css-dev-only-do-not-override-1okl62o).ant-tour {
+    @include abstracts.screen(md) {
+        width: 300px !important;
+    }
+}
+
+.ant-layout-sider-children .ant-menu-item {
+    display: flex;
+    align-items: center;
+}
+
+.load-icon {
+    width: 20px;
+    height: 20px;
+}

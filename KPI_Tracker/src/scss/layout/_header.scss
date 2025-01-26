@@ -1,0 +1,58 @@
+header {
+    border-bottom: 1px solid #E0E0E0;
+}
+
+span.anticon-question-circle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f5f7fa;
+    border-radius: 50%;
+    padding: 7px;
+    margin-top: 5px;
+    svg {
+        height: 18px;
+        width: 18px;
+    }
+}
+// .header {
+//     display: flex;
+//     justify-content: flex-end;
+//     padding: 15px 50px;
+//     background-color: #fff;
+//     border-bottom: 1px solid #E0E0E0;
+//     &-act {
+//         display: flex;
+//         align-items: center;
+//         gap: 30px;
+        
+//         &-user {
+//             display: flex;
+//             gap: 16px;
+
+//             &-avt {
+//                 width: 50px;
+//                 height: 50px;
+//                 border-radius: 50%;
+//                 object-fit: cover;
+//             }
+
+//             &-info {
+//                 display: flex;
+//                 flex-direction: column;
+//                 justify-content: center;
+//                 gap: 5px;
+//             }
+
+//             &-name {
+//                 font-size: 1.4rem;
+//                 font-weight: 700;
+//             }
+
+//             &-role {
+//                 font-size: 1.2rem;
+//                 font-weight: 600;
+//             }
+//         }
+//     }
+// }

@@ -1,0 +1,102 @@
+@use "../abstracts";
+
+h1.page-title {
+    color: #010c80;
+    font-size: 3.2rem;
+    font-weight: 700;
+    margin-top: 20px;
+}
+.item-kpi {
+    background-color: #fff;
+    box-shadow: 0 0px 6px rgba(0, 0, 0, 0.2);
+    margin: 10px 0 20px;
+    padding: 20px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    @include abstracts.screen(md) {
+        padding: 20px;
+        flex-direction: column;
+        // justify-content: center;
+        align-items: flex-start;
+    }
+
+    &-name {
+        font-size: 1.7rem;
+        line-height: 135.294%; /* 135.294% */
+        font-weight: 500;
+        margin-bottom: 10px;
+    }
+
+    &-desc {
+        color: #557893;
+        width: 200px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        @include abstracts.screen(md) {
+            margin-bottom: 20px;
+        }
+    }
+
+    &-act {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+
+        @include abstracts.screen(md) {
+            flex-direction: column;
+            // justify-content: center;
+            align-items: flex-start;
+        }
+        button {
+            padding: 10px 30px;
+            cursor: pointer;
+            border: 1px solid #718ebf;
+            border-radius: 999px;
+            color: #718ebf;
+            transition: all 0.3s ease; /* Thêm hiệu ứng chuyển đổi */
+
+            &:hover {
+                background-color: #718ebf;
+                color: white;
+            }
+
+            &.btn-remove {
+                color: #ff4d4f;
+                border: 1px solid #ff4d4f;
+
+                &:hover {
+                    background-color: #ff4d4f;
+                    color: white;
+                }
+            }
+        }
+    }
+
+    .item-kpi-btn-act {
+        display: flex;
+        gap: 10px;
+    }
+}
+
+.row-duy {
+    // margin-top: 5px;
+    // margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    .ant-btn {
+        background-color: #1814f2 !important;
+    }
+}
+
+:where(.css-dev-only-do-not-override-1okl62o).ant-pagination .ant-pagination-item-active {
+    border-color: #1814f2;
+    transform: 0.2s ease;
+    a {
+        color: #1814f2;
+    }
+}

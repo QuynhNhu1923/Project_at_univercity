@@ -1,0 +1,15 @@
+@use "../abstracts";
+
+.logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+
+    &__img {
+        height: 3.6rem;
+        @include abstracts.screen(md) {
+            height: 3rem;
+        }
+    }
+}

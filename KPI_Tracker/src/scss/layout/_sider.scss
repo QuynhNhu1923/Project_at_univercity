@@ -1,0 +1,31 @@
+.ant-layout-sider-children {
+    background-color: #fff;
+    border-right: 1px solid #E0E0E0;
+
+    .logo {
+        margin: 20px auto;
+    }
+
+    .ant-menu{
+        background-color: inherit;
+        font-size: 1.4rem;
+
+        &-title-content, &-item .anticon {
+            color: var(--text-color);
+        }
+    }
+
+    .ant-menu-item {
+        height: 50px;
+    }
+
+    .ant-menu-item-selected {
+        .ant-menu-title-content,.anticon {
+            color: #FFF;
+        }
+    }
+}
+
+.ant-menu-title-content a {
+    transition: color 0s;
+}

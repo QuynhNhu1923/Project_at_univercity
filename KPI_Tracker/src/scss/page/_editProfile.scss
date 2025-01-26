@@ -1,0 +1,20 @@
+@use "../abstracts";
+
+.customSizedUpload .ant-upload {
+  width: 180px !important;
+  height: 180px !important;
+}
+
+.ant-upload-list-item-container {
+  width: 180px !important;
+  height: 180px !important;
+}
+
+.ant-upload-wrapper {
+  margin-right: 20px;
+}
+
+.upload-center {
+  display: flex;
+  justify-content: center;
+}
