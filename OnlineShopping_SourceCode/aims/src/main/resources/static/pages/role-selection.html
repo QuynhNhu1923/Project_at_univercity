@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AIMS - Role Selection</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+<div class="container">
+    <h1>AIMS - Internet Media Store</h1>
+    <div id="role-selection" class="section">
+        <h2>Select Your Role</h2>
+        <button onclick="selectRole('customer')">Customer</button>
+        <button onclick="selectRole('productmanager')">Product Manager</button>
+        <button onclick="selectRole('admin')">Admin</button>
+    </div>
+</div>
+<script src="/js/navigation.js"></script>
+<script>
+    console.log('role-selection.html loaded, checking navigation.js at:', '/js/navigation.js');
+    if (typeof selectRole === 'undefined') {
+        console.error('selectRole function not loaded!');
+    }
+</script>
+<!--<script src="/js/main.js"></script>-->
+</body>
+</html>

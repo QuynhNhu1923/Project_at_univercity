@@ -1,0 +1,182 @@
+/* Định dạng chung cho ứng dụng */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f9f9f9;
+    display: flex;
+    justify-content: center;
+    align-items: stretch; /* Kéo dài theo chiều dọc */
+    min-height: 100vh;
+    width: 100vw; /* Chiếm toàn bộ chiều rộng viewport */
+    overflow: hidden; /* Ngăn cuộn nếu không cần */
+}
+
+.container {
+    width: 100vw; /* Chiếm toàn bộ chiều rộng viewport */
+    min-height: 100vh; /* Chiếm toàn bộ chiều cao viewport */
+    margin: 0; /* Xóa margin để lấp đầy */
+    padding: 2rem;
+    background-color: #fff;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Căn giữa nội dung */
+}
+
+.hidden {
+    display: none;
+}
+
+.section {
+    margin-bottom: 1.5rem;
+}
+
+.error {
+    color: red;
+}
+
+button {
+    margin: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    cursor: pointer;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 0.25rem;
+    font-size: 1.2rem; /* Tăng kích thước chữ để phù hợp với không gian lớn */
+    transition: background-color 0.3s;
+    min-width: 200px; /* Độ rộng lớn hơn để cân đối */
+}
+
+button:hover {
+    background-color: #45a049;
+}
+
+input, select, textarea {
+    margin: 0.5rem;
+    padding: 0.5rem;
+    border: 1px solid #ddd;
+    border-radius: 0.25rem;
+    font-size: 1.2rem; /* Tăng kích thước chữ */
+    width: 100%;
+    max-width: 400px; /* Tăng giới hạn chiều rộng */
+    box-sizing: border-box;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1.5rem;
+    flex-grow: 1; /* Mở rộng để lấp đầy không gian */
+}
+
+th, td {
+    border: 1px solid #ddd;
+    padding: 0.75rem; /* Tăng padding cho bảng */
+    text-align: left;
+    font-size: 1rem; /* Tăng kích thước chữ */
+}
+
+.pagination {
+    margin-top: 1rem;
+    text-align: center;
+    padding-bottom: 1rem;
+}
+
+.pagination button {
+    padding: 0.75rem 1.5rem; /* Tăng padding */
+    margin: 0 0.5rem;
+    font-size: 1rem;
+}
+
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.form-group label {
+    display: inline-block;
+    width: 15%;
+    text-align: right;
+    margin-right: 1rem;
+    font-size: 1.2rem; /* Tăng kích thước chữ */
+}
+
+.rush-supported {
+    color: green;
+    font-weight: bold;
+}
+
+.rush-unsupported {
+    color: red;
+}
+
+/* Style cụ thể cho role-selection.html */
+.role-selection {
+    width: 100vw; /* Chiếm toàn bộ chiều rộng */
+    min-height: 100vh; /* Chiếm toàn bộ chiều cao */
+    padding: 2rem 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* Căn giữa theo chiều dọc */
+    text-align: center;
+}
+
+.role-selection h1 {
+    margin-bottom: 2rem;
+    font-size: 3rem; /* Tăng kích thước tiêu đề */
+    color: #333;
+}
+
+.role-selection h2 {
+    margin-bottom: 3rem;
+    font-size: 2rem; /* Tăng kích thước phụ đề */
+    color: #555;
+}
+
+.role-selection .role-buttons {
+    display: flex;
+    justify-content: center; /* Căn giữa các nút */
+    gap: 3rem; /* Tăng khoảng cách giữa các nút */
+    flex-wrap: wrap; /* Cho phép xuống dòng trên màn hình nhỏ */
+}
+
+.role-selection .role-buttons a {
+    text-decoration: none;
+}
+
+.role-selection .role-buttons button {
+    margin: 0; /* Xóa margin để dùng gap */
+    min-width: 250px; /* Tăng độ rộng để cân đối */
+    font-size: 1.5rem; /* Tăng kích thước chữ */
+}
+
+/* Media queries để tối ưu cho laptop */
+@media screen and (max-width: 1366px) {
+    .role-selection h1 {
+        font-size: 2.5rem;
+    }
+    .role-selection h2 {
+        font-size: 1.5rem;
+    }
+    .role-selection .role-buttons button {
+        min-width: 200px;
+        font-size: 1.2rem;
+    }
+}
+
+@media screen and (max-width: 1024px) {
+    .container {
+        padding: 1.5rem;
+    }
+    .role-selection h1 {
+        font-size: 2rem;
+    }
+    .role-selection h2 {
+        font-size: 1.2rem;
+    }
+    .role-selection .role-buttons button {
+        min-width: 150px;
+        font-size: 1rem;
+    }
+}

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AIMS - Product Management</title>
+    <link rel="stylesheet" href="../../css/styles.css">
+</head>
+<body>
+<div class="container">
+    <div id="product-management-section" class="section">
+        <h2>Manage Products</h2>
+        <form id="product-form" onsubmit="addProduct(event)">
+            <div class="form-group">
+                <label for="product-type">Type:</label>
+                <select id="product-type" required>
+                    <option value="BOOK">Book</option>
+                    <option value="CD">CD</option>
+                    <option value="LP">LP</option>
+                    <option value="DVD">DVD</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="product-name-input">Name:</label>
+                <input type="text" id="product-name-input" required>
+            </div>
+            <div class="form-group">
+                <label for="product-price-input">Price (VND):</label>
+                <input type="number" id="product-price-input" min="0" step="0.01" required>
+            </div>
+            <div class="form-group">
+                <label for="product-stock-input">Stock:</label>
+                <input type="number" id="product-stock-input" min="0" required>
+            </div>
+            <div class="form-group">
+                <label for="product-release-date">Release Date:</label>
+                <input type="date" id="product-release-date">
+            </div>
+            <div class="form-group">
+                <label for="product-author">Author/Artist:</label>
+                <input type="text" id="product-author">
+            </div>
+            <div class="form-group">
+                <label for="product-description-input">Description:</label>
+                <textarea id="product-description-input" required></textarea>
+            </div>
+            <div class="form-group">
+                <label for="rush-supported">Rush Delivery Supported:</label>
+                <input type="checkbox" id="rush-supported">
+            </div>
+            <button type="submit">Add Product</button>
+            <button type="button" onclick="updateProduct()">Update Product</button>
+            <p id="product-error" class="error hidden"></p>
+        </form>
+        <table id="product-manager-list">
+            <thead>
+            <tr>
+                <th>Select</th>
+                <th>Name</th>
+                <th>Type</th>
+                <th>Price</th>
+                <th>Stock</th>
+                <th>Rush Delivery</th>
+            </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+        <button onclick="deleteSelectedProducts()">Delete Selected</button>
+        <div class="pagination">
+            <button onclick="prevProductManagerPage()">Previous</button>
+            <button onclick="nextProductManagerPage()">Next</button>
+        </div>
+        <button onclick="navigateTo('productmanager/dashboard.html')">Back</button>
+    </div>
+</div>
+<script src="/js/main.js"></script>
+<script src="/js/navigation.js"></script>
+<script src="/js/product.js"></script>
+</body>
+</html>

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AIMS - Cart</title>
+    <link rel="stylesheet" href="../../css/styles.css">
+</head>
+<body>
+<div class="container">
+    <div id="cart-section" class="section">
+        <h2>Your Cart</h2>
+        <table id="cart-items">
+            <thead>
+            <tr>
+                <th>Product</th>
+                <th>Quantity</th>
+                <th>Price (excl. VAT)</th>
+                <th>Rush Delivery</th>
+                <th>Action</th>
+            </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+        <p><strong>Total (excl. VAT):</strong> <span id="cart-total">0 VND</span></p>
+        <button onclick="checkStockAndProceed()">Proceed to Order</button>
+        <button onclick="navigateTo('customer/dashboard.html')">Back</button>
+        <p id="cart-error" class="error hidden"></p>
+    </div>
+</div>
+<script src="/js/navigation.js"></script>
+<script src="/js/main.js"></script>
+<script src="/js/cart.js"></script>
+</body>
+</html>
