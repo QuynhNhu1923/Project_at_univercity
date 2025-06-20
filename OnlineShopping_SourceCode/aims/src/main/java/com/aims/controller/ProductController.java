@@ -89,7 +89,7 @@ public class ProductController {
             product.setCondition((String) productData.get("condition"));
 
             Map<String, Object> specificDetails = (Map<String, Object>) request.get("specificDetails");
-            productService.saveProduct(product, specificDetails); // Dòng 77
+            productService.saveProduct(product, specificDetails);
             return ResponseEntity.ok("Product created successfully");
         } catch (IllegalArgumentException e) {
             logger.warn("Invalid product data: {}", e.getMessage());

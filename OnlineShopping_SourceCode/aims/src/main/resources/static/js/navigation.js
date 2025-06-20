@@ -1,6 +1,6 @@
 // Định nghĩa biến toàn cục
-let sessionId = null;
-let cart = [];
+// let sessionId = null;
+// let cart = [];
 
 function selectRole(role) {
     console.log('Selecting role:', role);

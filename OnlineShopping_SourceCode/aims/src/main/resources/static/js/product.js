@@ -1,61 +1,122 @@
-/* Tìm kiếm sản phẩm */
-async function searchProducts() {
-    const query = document.getElementById('search-products').value;
-    const attribute = document.getElementById('search-attribute').value;
-    const sort = document.getElementById('sort-products').value;
-    try {
-        const url = query
-            ? `http://localhost:8080/api/products/search?query=${encodeURIComponent(query)}&attribute=${attribute}&sort=${sort}&page=${currentPage('products')}&size=20`
-            : `http://localhost:8080/api/products/random?page=${currentPage('products')}&size=20&sort=${sort}`;
-        const response = await fetch(url);
-        if (!response.ok) throw new Error('Failed to fetch products.');
-        const data = await response.json();
-        const productList = document.querySelector('#product-list tbody');
-        productList.innerHTML = '';
-        data.content.forEach(product => {
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>${product.name}</td>
-                <td>${product.type}</td>
-                <td>${product.price} VND</td>
-                <td>${product.stock}</td>
-                <td class="${product.rushSupported ? 'rush-supported' : 'rush-unsupported'}">
-                    ${product.rushSupported ? 'Supported' : 'Not Supported'}
-                </td>
-                <td><button onclick="viewProductDetails('${product.barcode}')">View</button></td>
-            `;
-            productList.appendChild(row);
-        });
-    } catch (error) {
-        alert('Error searching products: ' + error.message);
-    }
+/* Biến toàn cục để quản lý trạng thái */
+let currentPages = {
+    products: 0,
+    orders: 0,
+    productManager: 0,
+    pendingOrders: 0
+};
+let sessionId = localStorage.getItem('sessionId') || Math.random().toString(36).substring(2);
+let cart = localStorage.getItem('cart') ? JSON.parse(localStorage.getItem('cart')) : [];
+let selectedProduct = null;
+
+/* Lấy số trang hiện tại */
+function currentPage(key) {
+    return currentPages[key] || 0;
 }
 
+/* Cập nhật số trang */
+function updateCurrentPage(key, page) {
+    currentPages[key] = page;
+}
+
+/* Tìm kiếm sản phẩm */
+/* Hàm tìm kiếm sản phẩm */
+function searchProducts(page = 0, sort = 'priceAsc', attribute = 'barcode', keyword = '') {
+    updateCurrentPage('products', page);
+    const url = `/api/products?page=${page}&size=20`; // Chỉ dùng page và size, bỏ sort và attribute tạm thời
+    console.log("Searching products: URL=", url, "Params:", { page, sort, attribute, keyword });
+
+    fetch(url, {
+        method: 'GET',
+        headers: {
+            'Authorization': 'Bearer ' + (localStorage.getItem('token') || ''),
+            'Content-Type': 'application/json'
+        }
+    })
+        .then(response => {
+            if (!response.ok) {
+                console.error("API Error:", response.status, response.statusText);
+                throw new Error(`Network error: ${response.status} - ${response.statusText}`);
+            }
+            return response.text(); // Đọc text trước để kiểm tra
+        })
+        .then(text => {
+            try {
+                const data = text ? JSON.parse(text) : {};
+                console.log("Raw API Response:", text); // Log raw response
+                console.log("Parsed API Response:", data);
+
+                // Xử lý cấu trúc PageImpl không ổn định
+                let content = [];
+                let totalPages = 0;
+                if (data.content) {
+                    content = data.content;
+                } else if (data._embedded && data._embedded.products) {
+                    content = data._embedded.products; // Trường hợp dùng HATEOAS
+                } else if (Array.isArray(data)) {
+                    content = data; // Trường hợp trả về mảng trực tiếp
+                }
+                if (data.totalPages) {
+                    totalPages = data.totalPages;
+                } else if (data.page && data.page.totalPages) {
+                    totalPages = data.page.totalPages;
+                }
+
+                const grid = document.getElementById('product-grid');
+                if (!grid) {
+                    console.error("Product grid not found!");
+                    throw new Error('Product grid element not found!');
+                }
+
+                grid.innerHTML = '';
+                if (content.length > 0) {
+                    content.forEach(product => {
+                        const item = document.createElement('div');
+                        item.className = 'product-item';
+                        item.innerHTML = `
+                            <div>Name: ${product.title || product.name || 'N/A'}</div>
+                            <div>Type: ${product.category || 'N/A'}</div>
+                            <div>Price: $${(product.price || 0).toFixed(2)}</div>
+                            <div>Stock: ${product.quantity || product.stock || '0'}</div>
+                            <div>Rush Delivery: ${product.rush_delivery ? 'Yes' : 'No'}</div>
+                            <button onclick="loadProductDetails('${product.barcode || product.id || ''}')">View</button>
+                        `;
+                        grid.appendChild(item);
+                    });
+                    updatePagination(totalPages, page);
+                } else {
+                    grid.innerHTML = '<div>No products found matching your search</div>';
+                }
+            } catch (jsonError) {
+                console.error("JSON Parse Error:", jsonError, "Raw Response:", text);
+                const grid = document.getElementById('product-grid');
+                if (grid) grid.innerHTML = `<div>Error parsing data: ${jsonError.message}</div>`;
+                throw jsonError;
+            }
+        })
+        .catch(error => {
+            console.error("Error fetching products:", error);
+            const grid = document.getElementById('product-grid');
+            if (grid) grid.innerHTML = `<div>Error loading products: ${error.message}</div>`;
+        });
+}
 /* Xem chi tiết sản phẩm */
 async function viewProductDetails(barcode) {
-    try {
-        const response = await fetch(`http://localhost:8080/api/products?barcode=${barcode}`);
-        if (!response.ok) throw new Error('Failed to fetch product.');
-        const product = await response.json();
-        sessionStorage.setItem('selectedProduct', JSON.stringify(product));
-        navigateTo('customer/product-detail.html');
-    } catch (error) {
-        alert('Error fetching product: ' + error.message);
-    }
+    loadProductDetails(barcode); // Gọi hàm từ main.js
 }
 
 /* Thêm sản phẩm mới */
 async function addProduct(event) {
     event.preventDefault();
     const productData = {
-        type: document.getElementById('product-type').value,
-        name: document.getElementById('product-name-input').value,
+        category: document.getElementById('product-type').value,
+        title: document.getElementById('product-name-input').value,
         price: parseFloat(document.getElementById('product-price-input').value),
-        stock: parseInt(document.getElementById('product-stock-input').value),
+        quantity: parseInt(document.getElementById('product-stock-input').value),
         releaseDate: document.getElementById('product-release-date').value || null,
         author: document.getElementById('product-author').value || '',
         description: document.getElementById('product-description-input').value,
-        rushSupported: document.getElementById('rush-supported').checked
+        rush_delivery: document.getElementById('rush-supported').checked
     };
     const errorElement = document.getElementById('product-error');
     errorElement.classList.add('hidden');
@@ -65,9 +126,12 @@ async function addProduct(event) {
         return;
     }
     try {
-        const response = await fetch('http://localhost:8080/api/products/create', {
+        const response = await fetch('/api/products', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + (localStorage.getItem('token') || '')
+            },
             body: JSON.stringify(productData)
         });
         if (!response.ok) throw new Error('Failed to add product.');
@@ -88,14 +152,14 @@ async function updateProduct() {
     }
     const productData = {
         barcode: selectedProduct.barcode,
-        type: document.getElementById('product-type').value,
-        name: document.getElementById('product-name-input').value,
+        category: document.getElementById('product-type').value,
+        title: document.getElementById('product-name-input').value,
         price: parseFloat(document.getElementById('product-price-input').value),
-        stock: parseInt(document.getElementById('product-stock-input').value),
+        quantity: parseInt(document.getElementById('product-stock-input').value),
         releaseDate: document.getElementById('product-release-date').value || null,
         author: document.getElementById('product-author').value || '',
         description: document.getElementById('product-description-input').value,
-        rushSupported: document.getElementById('rush-supported').checked
+        rush_delivery: document.getElementById('rush-supported').checked
     };
     const errorElement = document.getElementById('product-error');
     errorElement.classList.add('hidden');
@@ -105,12 +169,16 @@ async function updateProduct() {
         return;
     }
     try {
-        const limitResponse = await fetch('http://localhost:8080/api/products/limits');
+        const limitResponse = await fetch('/api/products/limits', {
+            headers: { 'Authorization': 'Bearer ' + (localStorage.getItem('token') || '') }
+        });
         const limits = await limitResponse.json();
         if (limits.updateCount >= 30) {
             throw new Error('Daily update limit (30 products) reached.');
         }
-        const priceLimitResponse = await fetch(`http://localhost:8080/api/products/price-limits?barcode=${selectedProduct.barcode}`);
+        const priceLimitResponse = await fetch(`/api/products/price-limits?barcode=${selectedProduct.barcode}`, {
+            headers: { 'Authorization': 'Bearer ' + (localStorage.getItem('token') || '') }
+        });
         const priceLimits = await priceLimitResponse.json();
         if (priceLimits.updateCount >= 2) {
             throw new Error('Daily price update limit (2 times) reached.');
@@ -118,9 +186,12 @@ async function updateProduct() {
         if (productData.price < priceLimits.minPrice || productData.price > priceLimits.maxPrice) {
             throw new Error('Price must be between 30% and 150% of actual value.');
         }
-        const response = await fetch('http://localhost:8080/api/products/update', {
+        const response = await fetch('/api/products', {
             method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + (localStorage.getItem('token') || '')
+            },
             body: JSON.stringify(productData)
         });
         if (!response.ok) throw new Error('Failed to update product.');
@@ -136,7 +207,7 @@ async function updateProduct() {
 
 /* Xóa các sản phẩm được chọn */
 async function deleteSelectedProducts() {
-    const checkboxes = document.querySelectorAll('#product-manager-list input[type="checkbox"]:checked');
+    const checkboxes = document.querySelectorAll('#product-manager-grid input[type="checkbox"]:checked');
     if (checkboxes.length > 10) {
         alert('Cannot delete more than 10 products at a time.');
         return;
@@ -144,15 +215,18 @@ async function deleteSelectedProducts() {
     const errorElement = document.getElementById('product-error');
     errorElement.classList.add('hidden');
     try {
-        const limitResponse = await fetch('http://localhost:8080/api/products/limits');
+        const limitResponse = await fetch('/api/products/limits', {
+            headers: { 'Authorization': 'Bearer ' + (localStorage.getItem('token') || '') }
+        });
         const limits = await limitResponse.json();
         if (limits.deleteCount + checkboxes.length > 30) {
             throw new Error('Daily delete limit (30 products) reached.');
         }
         for (const checkbox of checkboxes) {
             const barcode = checkbox.value;
-            const response = await fetch(`http://localhost:8080/api/products/delete/${barcode}`, {
-                method: 'DELETE'
+            const response = await fetch(`/api/products/${barcode}`, {
+                method: 'DELETE',
+                headers: { 'Authorization': 'Bearer ' + (localStorage.getItem('token') || '') }
             });
             if (!response.ok) throw new Error(`Failed to delete product ${barcode}.`);
         }
@@ -167,25 +241,35 @@ async function deleteSelectedProducts() {
 /* Tải danh sách sản phẩm cho Quản Lý Sản Phẩm */
 async function loadProductManagerList() {
     try {
-        const response = await fetch(`http://localhost:8080/api/products?page=${currentPage('productManager')}&size=20&sort=priceAsc`);
+        const response = await fetch(`/api/products?page=${currentPage('productManager')}&size=20&sort=priceAsc`, {
+            headers: { 'Authorization': 'Bearer ' + (localStorage.getItem('token') || '') }
+        });
         if (!response.ok) throw new Error('Failed to fetch products.');
         const data = await response.json();
-        const productList = document.querySelector('#product-manager-list tbody');
-        productList.innerHTML = '';
-        data.content.forEach(product => {
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td><input type="checkbox" value="${product.barcode}"></td>
-                <td>${product.name}</td>
-                <td>${product.type}</td>
-                <td>${product.price} VND</td>
-                <td>${product.stock}</td>
-                <td>${product.rushSupported ? 'Yes' : 'No'}</td>
-            `;
-            row.onclick = () => selectProductForUpdate(product);
-            productList.appendChild(row);
-        });
+        const productGrid = document.getElementById('product-manager-grid');
+        if (!productGrid) throw new Error('Product manager grid not found!');
+        productGrid.innerHTML = '';
+        if (data.content?.length > 0) {
+            data.content.forEach(product => {
+                const item = document.createElement('div');
+                item.className = 'product-item';
+                item.innerHTML = `
+                    <div><input type="checkbox" value="${product.barcode}"></div>
+                    <div data-label="Name:">${product.title || 'N/A'}</div>
+                    <div data-label="Type:">${product.category || 'N/A'}</div>
+                    <div data-label="Price:">${product.price ? `$${product.price.toFixed(2)}` : '$0.00'}</div>
+                    <div data-label="Stock:">${product.quantity || '0'}</div>
+                    <div data-label="Rush Delivery:">${product.rush_delivery ? 'Yes' : 'No'}</div>
+                `;
+                item.onclick = () => selectProductForUpdate(product);
+                productGrid.appendChild(item);
+            });
+            updatePagination(data.totalPages, currentPage('productManager')); // Sử dụng hàm từ main.js
+        } else {
+            productGrid.innerHTML = '<div>No products found</div>';
+        }
     } catch (error) {
+        console.error('Error in loadProductManagerList:', error);
         alert('Error loading products: ' + error.message);
     }
 }
@@ -193,25 +277,25 @@ async function loadProductManagerList() {
 /* Chọn sản phẩm để cập nhật */
 function selectProductForUpdate(product) {
     selectedProduct = product;
-    document.getElementById('product-type').value = product.type;
-    document.getElementById('product-name-input').value = product.name;
+    document.getElementById('product-type').value = product.category;
+    document.getElementById('product-name-input').value = product.title;
     document.getElementById('product-price-input').value = product.price;
-    document.getElementById('product-stock-input').value = product.stock;
+    document.getElementById('product-stock-input').value = product.quantity;
     document.getElementById('product-release-date').value = product.releaseDate || '';
     document.getElementById('product-author').value = product.author || '';
     document.getElementById('product-description-input').value = product.description;
-    document.getElementById('rush-supported').checked = product.rushSupported;
+    document.getElementById('rush-supported').checked = product.rush_delivery;
 }
 
 /* Validate dữ liệu sản phẩm */
 function validateProduct(product) {
-    if (!product.name || !product.type || !product.price || !product.stock || !product.description) {
+    if (!product.title || !product.category || !product.price || !product.quantity || !product.description) {
         return false;
     }
     if (product.releaseDate && !/^\d{4}-\d{2}-\d{2}$/.test(product.releaseDate)) {
         return false;
     }
-    if (product.price <= 0 || product.stock < 0) {
+    if (product.price <= 0 || product.quantity < 0) {
         return false;
     }
     return true;
@@ -221,19 +305,22 @@ function validateProduct(product) {
 function prevProductPage() {
     if (currentPage('products') > 0) {
         updateCurrentPage('products', currentPage('products') - 1);
-        searchProducts();
+        searchProducts(currentPage('products'), document.getElementById('sort-products').value, document.getElementById('search-attribute').value, document.getElementById('search-products').value);
     }
 }
+
 function nextProductPage() {
     updateCurrentPage('products', currentPage('products') + 1);
-    searchProducts();
+    searchProducts(currentPage('products'), document.getElementById('sort-products').value, document.getElementById('search-attribute').value, document.getElementById('search-products').value);
 }
+
 function prevProductManagerPage() {
     if (currentPage('productManager') > 0) {
         updateCurrentPage('productManager', currentPage('productManager') - 1);
         loadProductManagerList();
     }
 }
+
 function nextProductManagerPage() {
     updateCurrentPage('productManager', currentPage('productManager') + 1);
     loadProductManagerList();

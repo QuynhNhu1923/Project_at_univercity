@@ -16,7 +16,7 @@ async function addToCart() {
         const cartData = await response.json();
         cart = cartData.items;
         alert('Product added to cart.');
-        navigateTo('customer/cart.html');
+        navigateTo('/pages/customer/cart.html');
     } catch (error) {
         alert('Error adding to cart: ' + error.message);
     }
@@ -95,7 +95,7 @@ async function checkStockAndProceed() {
         if (!response.ok) throw new Error('Some products are out of stock.');
         const cartData = await response.json();
         if (cartData.items && cartData.items.length > 0) {
-            navigateTo('customer/order.html');
+            navigateTo('/pages/customer/order.html');
         } else {
             alert('Cart is empty.');
         }

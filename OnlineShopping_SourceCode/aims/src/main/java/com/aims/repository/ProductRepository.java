@@ -8,16 +8,16 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
-import java.util.List;
-
 public interface ProductRepository extends JpaRepository<Product, String> {
-    List<Product> findByCategory(String category);
-    Page<Product> findByTitleContainingIgnoreCase(String title, Pageable pageable);
-//    Page<Product> findByTypeContainingIgnoreCase(String type, Pageable pageable);
-//    Page<Product> findByAuthorContainingIgnoreCase(String author, Pageable pageable);
-//    Page<Product> findByBarcode(String barcode, Pageable pageable);
+    // Sử dụng Pageable cho findByCategory
+    Page<Product> findByCategory(String category, Pageable pageable);
 
-    // Tìm sản phẩm theo barcode (single result)
+    Page<Product> findByTitleContainingIgnoreCase(String title, Pageable pageable);
+
+    // Sử dụng Pageable cho findByBarcode (phân trang)
+    Page<Product> findByBarcode(String barcode, Pageable pageable);
+
+    // Phương thức tìm một sản phẩm duy nhất (không phân trang)
     Product findByBarcode(String barcode);
 
     // Lấy sản phẩm ngẫu nhiên

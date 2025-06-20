@@ -4,52 +4,38 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AIMS - Customer Dashboard</title>
-    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="../../css/styles.css">
 </head>
 <body>
 <div class="container">
-    <div id="customer-section" class="section">
+    <div class="customer-section">
         <h2>Customer Dashboard</h2>
-        <div>
+        <div class="search-controls">
             <select id="search-attribute">
-                <option value="name">Name</option>
-                <option value="type">Type</option>
-                <option value="author">Author/Artist</option>
+                <option value="title">Name</option>
+                <option value="category">Category</option>
+                <option value="barcode">Barcode</option>
             </select>
             <input type="text" id="search-products" placeholder="Search">
             <select id="sort-products">
                 <option value="priceAsc">Price: Low to High</option>
                 <option value="priceDesc">Price: High to Low</option>
             </select>
-            <button onclick="searchProducts()">Search</button>
+            <button onclick="searchProducts(0, document.getElementById('sort-products').value, document.getElementById('search-attribute').value, document.getElementById('search-products').value)">Search</button>
         </div>
-        <div>
+        <div class="action-buttons">
             <button onclick="navigateTo('/pages/customer/cart.html')">View Cart</button>
             <button onclick="navigateTo('/pages/customer/orders.html')">View Orders</button>
             <button onclick="navigateTo('/pages/role-selection.html')">Back to Role Selection</button>
         </div>
-        <table id="product-list">
-            <thead>
-            <tr>
-                <th>Name</th>
-                <th>Type</th>
-                <th>Price (excl. VAT)</th>
-                <th>Stock</th>
-                <th>Rush Delivery</th>
-                <th>Action</th>
-            </tr>
-            </thead>
-            <tbody></tbody>
-        </table>
+        <div id="product-grid" class="product-grid"></div>
         <div class="pagination">
-            <button onclick="prevProductPage()">Previous</button>
-            <button onclick="nextProductPage()">Next</button>
+            <button id="prev-page">Previous</button>
+            <button id="next-page">Next</button>
         </div>
     </div>
 </div>
-<!-- Nạp navigation.js trước main.js -->
 <script src="/js/navigation.js"></script>
 <script src="/js/main.js"></script>
-<script src="/js/cart.js"></script>
 </body>
 </html>

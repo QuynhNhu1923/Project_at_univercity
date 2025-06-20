@@ -39,15 +39,13 @@ public class ProductService {
 
     public Page<Product> getAllProducts(int page, String sort, String barcode, String category) {
         Sort sortOrder = sort.equalsIgnoreCase("priceDesc") ? Sort.by("price").descending() : Sort.by("price").ascending();
-        Pageable pageable = PageRequest.of(page, 20, sortOrder);
+        Pageable pageable = PageRequest.of(page, 20, sortOrder); // Sử dụng Pageable với kích thước 20
         Page<Product> products;
         if (barcode != null && !barcode.isEmpty()) {
-            Product product = productRepository.findByBarcode(barcode);
-            products = product != null ? new org.springframework.data.domain.PageImpl<>(List.of(product), pageable, 1) : Page.empty(pageable);
+            products = productRepository.findByBarcode(barcode, pageable); // Sử dụng phiên bản phân trang
             logger.info("Fetched product by barcode {}: {} found", barcode, products.getTotalElements());
         } else if (category != null && !category.isEmpty()) {
-            List<Product> productList = productRepository.findByCategory(category);
-            products = new org.springframework.data.domain.PageImpl<>(productList, pageable, productList.size());
+            products = productRepository.findByCategory(category, pageable); // Sử dụng phiên bản phân trang
             logger.info("Fetched products by category {}: {} found", category, products.getTotalElements());
         } else {
             products = productRepository.findAll(pageable);
@@ -61,7 +59,6 @@ public class ProductService {
             logger.warn("Invalid search query provided");
             throw new IllegalArgumentException("Search query cannot be empty");
         }
-
         Sort sortOrder = sort.equalsIgnoreCase("priceDesc") ? Sort.by("price").descending() : Sort.by("price").ascending();
         Pageable pageable = PageRequest.of(page, 20, sortOrder);
         Page<Product> products = productRepository.findByTitleContainingIgnoreCase(query, pageable);
@@ -74,7 +71,7 @@ public class ProductService {
             logger.error("Invalid barcode provided");
             throw new IllegalArgumentException("Invalid barcode");
         }
-        Product product = productRepository.findByBarcode(barcode);
+        Product product = productRepository.findByBarcode(barcode); // Sử dụng phương thức không phân trang
         if (product == null) {
             logger.warn("Product not found for barcode: {}", barcode);
         } else {
