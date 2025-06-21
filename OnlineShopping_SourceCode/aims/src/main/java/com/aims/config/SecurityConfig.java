@@ -2,6 +2,7 @@ package com.aims.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
@@ -22,19 +23,18 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
-                .cors(cors -> cors.configurationSource(corsConfigurationSource())) // Liên kết với bean corsConfigurationSource
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .formLogin(form -> form.disable())
                 .httpBasic(httpBasic -> httpBasic.disable())
                 .authorizeHttpRequests(auth -> auth
-                        // Các endpoint công khai
-                        .requestMatchers("/api/auth/**", "/api/carts/**", "/api/products/**", "/api/orders/**", "/api/payments/vnpay", "/api/cart/**").permitAll()
-                        .requestMatchers("/pages/**", "/js/**", "/css/**").permitAll() // Cho phép tài nguyên tĩnh
-                        // Quyền của Product Manager
+                        .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/products/**").permitAll()
+                        .requestMatchers("/api/orders/**").permitAll()
+                        .requestMatchers("/api/payments/**").permitAll()
+                        .requestMatchers("/api/carts/**").permitAll() // Cho phép tất cả endpoint giỏ hàng
+                        .requestMatchers("/pages/**", "/js/**", "/css/**", "/favicon.ico").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/carts/*/items").permitAll()
                         .requestMatchers("/api/products/create", "/api/products/update", "/api/products/delete/**").hasRole("PRODUCT_MANAGER")
-                        .requestMatchers("/api/orders/approve/**", "/api/orders/reject/**").hasRole("PRODUCT_MANAGER")
-                        // Quyền của Admin
-                        .requestMatchers("/api/users/**").hasRole("ADMIN")
-                        // Tất cả các request khác yêu cầu xác thực
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
@@ -42,6 +42,7 @@ public class SecurityConfig {
         return http.build();
     }
 
+    @Bean
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
@@ -51,7 +52,7 @@ public class SecurityConfig {
         configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration); // Áp dụng cho tất cả endpoint
+        source.registerCorsConfiguration("/**", configuration);
         return source;
     }
 

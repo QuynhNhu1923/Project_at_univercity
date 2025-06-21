@@ -1,3 +1,4 @@
+// quản lý cho other role
 /* Biến toàn cục để quản lý trạng thái */
 let currentPages = {
     products: 0,
@@ -20,16 +21,15 @@ function updateCurrentPage(key, page) {
 }
 
 /* Tìm kiếm sản phẩm */
-/* Hàm tìm kiếm sản phẩm */
-function searchProducts(page = 0, sort = 'priceAsc', attribute = 'barcode', keyword = '') {
+function searchProducts({page = 0, sort = 'priceAsc', attribute = 'barcode', keyword = ''}) {
     updateCurrentPage('products', page);
-    const url = `/api/products?page=${page}&size=20`; // Chỉ dùng page và size, bỏ sort và attribute tạm thời
+    const url = `/api/products?page=${page}&size=20`;
     console.log("Searching products: URL=", url, "Params:", { page, sort, attribute, keyword });
 
     fetch(url, {
         method: 'GET',
         headers: {
-            'Authorization': 'Bearer ' + (localStorage.getItem('token') || ''),
+            //'Authorization': 'Bearer ' + (localStorage.getItem('token') || ''),
             'Content-Type': 'application/json'
         }
     })
@@ -38,23 +38,22 @@ function searchProducts(page = 0, sort = 'priceAsc', attribute = 'barcode', keyw
                 console.error("API Error:", response.status, response.statusText);
                 throw new Error(`Network error: ${response.status} - ${response.statusText}`);
             }
-            return response.text(); // Đọc text trước để kiểm tra
+            return response.text();
         })
         .then(text => {
             try {
                 const data = text ? JSON.parse(text) : {};
-                console.log("Raw API Response:", text); // Log raw response
+                console.log("Raw API Response:", text);
                 console.log("Parsed API Response:", data);
 
-                // Xử lý cấu trúc PageImpl không ổn định
                 let content = [];
                 let totalPages = 0;
                 if (data.content) {
                     content = data.content;
                 } else if (data._embedded && data._embedded.products) {
-                    content = data._embedded.products; // Trường hợp dùng HATEOAS
+                    content = data._embedded.products;
                 } else if (Array.isArray(data)) {
-                    content = data; // Trường hợp trả về mảng trực tiếp
+                    content = data;
                 }
                 if (data.totalPages) {
                     totalPages = data.totalPages;
@@ -78,8 +77,9 @@ function searchProducts(page = 0, sort = 'priceAsc', attribute = 'barcode', keyw
                             <div>Type: ${product.category || 'N/A'}</div>
                             <div>Price: $${(product.price || 0).toFixed(2)}</div>
                             <div>Stock: ${product.quantity || product.stock || '0'}</div>
-                            <div>Rush Delivery: ${product.rush_delivery ? 'Yes' : 'No'}</div>
+                            <div>Rush Delivery: ${product.rushDelivery ? 'Yes' : 'No'}</div>
                             <button onclick="loadProductDetails('${product.barcode || product.id || ''}')">View</button>
+                    
                         `;
                         grid.appendChild(item);
                     });
@@ -100,9 +100,10 @@ function searchProducts(page = 0, sort = 'priceAsc', attribute = 'barcode', keyw
             if (grid) grid.innerHTML = `<div>Error loading products: ${error.message}</div>`;
         });
 }
+
 /* Xem chi tiết sản phẩm */
 async function viewProductDetails(barcode) {
-    loadProductDetails(barcode); // Gọi hàm từ main.js
+    loadProductDetails(barcode);
 }
 
 /* Thêm sản phẩm mới */
@@ -116,7 +117,7 @@ async function addProduct(event) {
         releaseDate: document.getElementById('product-release-date').value || null,
         author: document.getElementById('product-author').value || '',
         description: document.getElementById('product-description-input').value,
-        rush_delivery: document.getElementById('rush-supported').checked
+        rushDelivery: document.getElementById('rush-supported').checked
     };
     const errorElement = document.getElementById('product-error');
     errorElement.classList.add('hidden');
@@ -159,7 +160,7 @@ async function updateProduct() {
         releaseDate: document.getElementById('product-release-date').value || null,
         author: document.getElementById('product-author').value || '',
         description: document.getElementById('product-description-input').value,
-        rush_delivery: document.getElementById('rush-supported').checked
+        rushDelivery: document.getElementById('rush-supported').checked
     };
     const errorElement = document.getElementById('product-error');
     errorElement.classList.add('hidden');
@@ -259,12 +260,12 @@ async function loadProductManagerList() {
                     <div data-label="Type:">${product.category || 'N/A'}</div>
                     <div data-label="Price:">${product.price ? `$${product.price.toFixed(2)}` : '$0.00'}</div>
                     <div data-label="Stock:">${product.quantity || '0'}</div>
-                    <div data-label="Rush Delivery:">${product.rush_delivery ? 'Yes' : 'No'}</div>
+                    <div data-label="Rush Delivery:">${product.rushDelivery ? 'Yes' : 'No'}</div>
                 `;
                 item.onclick = () => selectProductForUpdate(product);
                 productGrid.appendChild(item);
             });
-            updatePagination(data.totalPages, currentPage('productManager')); // Sử dụng hàm từ main.js
+            updatePagination(data.totalPages, currentPage('productManager'));
         } else {
             productGrid.innerHTML = '<div>No products found</div>';
         }
@@ -284,7 +285,7 @@ function selectProductForUpdate(product) {
     document.getElementById('product-release-date').value = product.releaseDate || '';
     document.getElementById('product-author').value = product.author || '';
     document.getElementById('product-description-input').value = product.description;
-    document.getElementById('rush-supported').checked = product.rush_delivery;
+    document.getElementById('rush-supported').checked = product.rushDelivery;
 }
 
 /* Validate dữ liệu sản phẩm */
@@ -305,13 +306,23 @@ function validateProduct(product) {
 function prevProductPage() {
     if (currentPage('products') > 0) {
         updateCurrentPage('products', currentPage('products') - 1);
-        searchProducts(currentPage('products'), document.getElementById('sort-products').value, document.getElementById('search-attribute').value, document.getElementById('search-products').value);
+        searchProducts({
+            page: currentPage('products'),
+            sort: document.getElementById('sort-products').value,
+            attribute: document.getElementById('search-attribute').value,
+            keyword: document.getElementById('search-products').value
+        });
     }
 }
 
 function nextProductPage() {
     updateCurrentPage('products', currentPage('products') + 1);
-    searchProducts(currentPage('products'), document.getElementById('sort-products').value, document.getElementById('search-attribute').value, document.getElementById('search-products').value);
+    searchProducts({
+        page: currentPage('products'),
+        sort: document.getElementById('sort-products').value,
+        attribute: document.getElementById('search-attribute').value,
+        keyword: document.getElementById('search-products').value
+    });
 }
 
 function prevProductManagerPage() {

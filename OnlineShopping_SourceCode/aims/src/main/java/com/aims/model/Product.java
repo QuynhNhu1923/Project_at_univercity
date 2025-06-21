@@ -1,7 +1,7 @@
-package com.aims.model;
+package com.aims.model; // Thay bằng package thực tế
 
 import jakarta.persistence.*;
-import java.time.LocalDateTime;
+
 import java.util.Date;
 
 @Entity
@@ -9,7 +9,7 @@ import java.util.Date;
 public class Product {
 
     @Id
-    @Column(name = "barcode")
+    @Column(name = "barcode", nullable = false)
     private String barcode;
 
     @Column(name = "title", nullable = false)
@@ -19,23 +19,22 @@ public class Product {
     private String category;
 
     @Column(name = "value", nullable = false)
-    private Double value;
+    private double value;
 
     @Column(name = "price", nullable = false)
-    private Double price;
+    private double price;
 
     @Column(name = "quantity", nullable = false)
-    private Integer quantity = 0;
+    private int quantity;
 
     @Column(name = "warehouse_entry_date", nullable = false)
-    @Temporal(TemporalType.DATE)
     private Date warehouseEntryDate;
 
     @Column(name = "dimensions")
     private String dimensions;
 
     @Column(name = "weight", nullable = false)
-    private Double weight;
+    private double weight;
 
     @Column(name = "description")
     private String description;
@@ -44,112 +43,74 @@ public class Product {
     private String condition;
 
     @Column(name = "created_at")
-    private LocalDateTime createdAt = LocalDateTime.now();
+    private Date createdAt;
 
     @Column(name = "updated_at")
-    private LocalDateTime updatedAt = LocalDateTime.now();
+    private Date updatedAt;
 
-    public String getBarcode() {
-        return barcode;
-    }
+    @Column(name = "rush_delivery", nullable = false)
+    private boolean rushDelivery;
 
-    public void setBarcode(String barcode) {
+    // Constructors
+    public Product() {}
+
+    public Product(String barcode, String title, String category, double value, double price, int quantity,
+                   Date warehouseEntryDate, String dimensions, double weight, String description,
+                   String condition, boolean rushDelivery) {
         this.barcode = barcode;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
         this.title = title;
-    }
-
-    public String getCategory() {
-        return category;
-    }
-
-    public void setCategory(String category) {
         this.category = category;
-    }
-
-    public Double getValue() {
-        return value;
-    }
-
-    public void setValue(Double value) {
         this.value = value;
-    }
-
-    public Double getPrice() {
-        return price;
-    }
-
-    public void setPrice(Double price) {
         this.price = price;
-    }
-
-    public Integer getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(Integer quantity) {
         this.quantity = quantity;
-    }
-
-    public Date getWarehouseEntryDate() {
-        return warehouseEntryDate;
-    }
-
-    public void setWarehouseEntryDate(Date warehouseEntryDate) {
         this.warehouseEntryDate = warehouseEntryDate;
-    }
-
-    public String getDimensions() {
-        return dimensions;
-    }
-
-    public void setDimensions(String dimensions) {
         this.dimensions = dimensions;
-    }
-
-    public Double getWeight() {
-        return weight;
-    }
-
-    public void setWeight(Double weight) {
         this.weight = weight;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
         this.description = description;
-    }
-
-    public String getCondition() {
-        return condition;
-    }
-
-    public void setCondition(String condition) {
         this.condition = condition;
+        this.rushDelivery = rushDelivery;
     }
 
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
+    // Getters and Setters
+    public String getBarcode() { return barcode; }
+    public void setBarcode(String barcode) { this.barcode = barcode; }
 
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
+    public String getTitle() { return title; }
+    public void setTitle(String title) { this.title = title; }
 
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
+    public String getCategory() { return category; }
+    public void setCategory(String category) { this.category = category; }
 
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
-    }
+    public double getValue() { return value; }
+    public void setValue(double value) { this.value = value; }
+
+    public double getPrice() { return price; }
+    public void setPrice(double price) { this.price = price; }
+
+    public int getQuantity() { return quantity; }
+    public void setQuantity(int quantity) { this.quantity = quantity; }
+
+    public Date getWarehouseEntryDate() { return warehouseEntryDate; }
+    public void setWarehouseEntryDate(Date warehouseEntryDate) { this.warehouseEntryDate = warehouseEntryDate; }
+
+    public String getDimensions() { return dimensions; }
+    public void setDimensions(String dimensions) { this.dimensions = dimensions; }
+
+    public double getWeight() { return weight; }
+    public void setWeight(double weight) { this.weight = weight; }
+
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
+
+    public String getCondition() { return condition; }
+    public void setCondition(String condition) { this.condition = condition; }
+
+    public Date getCreatedAt() { return createdAt; }
+    public void setCreatedAt(Date createdAt) { this.createdAt = createdAt; }
+
+    public Date getUpdatedAt() { return updatedAt; }
+    public void setUpdatedAt(Date updatedAt) { this.updatedAt = updatedAt; }
+
+    public boolean isRushDelivery() { return rushDelivery; }
+    public void setRushDelivery(boolean rushDelivery) { this.rushDelivery = rushDelivery; }
 }

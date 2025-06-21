@@ -1,95 +1,88 @@
-// Lấy sessionId từ localStorage hoặc tạo mới
 let sessionId = localStorage.getItem('sessionId');
 if (!sessionId) {
-    sessionId = Math.random().toString(36).substring(2);
+    sessionId = 'guest_' + Math.random().toString(36).substring(7);
     localStorage.setItem('sessionId', sessionId);
 }
 
-let cart = []; // Lưu giỏ hàng tạm thời
+let cart = [];
 
-/* Thêm sản phẩm vào giỏ hàng */
-async function addToCart() {
-    const product = JSON.parse(sessionStorage.getItem('selectedProduct'));
-    const quantity = parseInt(document.getElementById('product-quantity')?.value || 1);
-    if (!product || quantity <= 0 || quantity > product.quantity) {
-        alert('Invalid quantity.');
-        return;
-    }
-
-    try {
-        const response = await fetch(`http://localhost:8080/api/carts/${sessionId}/items`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + (localStorage.getItem('token') || '')
-            },
-            body: JSON.stringify({
-                barcode: product.barcode,
-                quantity: quantity
-            })
-        });
-        if (!response.ok) throw new Error('Failed to add to cart.');
-        const cartData = await response.json();
-        cart = cartData.items;
-        alert('Product added to cart.');
-        navigateTo('/pages/customer/cart.html');
-    } catch (error) {
-        alert('Error adding to cart: ' + error.message);
-    }
-}
-
-/* Tải giỏ hàng */
 async function loadCart() {
     try {
-        const response = await fetch(`http://localhost:8080/api/carts/${sessionId}`, {
+        console.log(`Fetching cart for sessionId: ${sessionId}`);
+        const response = await fetch(`/api/carts/${sessionId}`, {
             headers: {
-                'Authorization': 'Bearer ' + (localStorage.getItem('token') || '')
+                'Authorization': 'Bearer ' + (localStorage.getItem('token') || ''),
+                'Content-Type': 'application/json'
             }
         });
-        if (!response.ok) throw new Error('Failed to fetch cart.');
+        if (!response.ok) throw new Error(`Failed to fetch cart: ${response.status}`);
         const cartData = await response.json();
         cart = cartData.items || [];
 
         const cartItems = document.querySelector('#cart-items tbody');
+        const deficiencyDiv = document.getElementById('stock-deficiency');
+        const deficiencyItems = document.getElementById('deficiency-items');
+        const cartTotal = document.getElementById('cart-total');
+
+        if (!cartItems || !cartTotal) {
+            console.error('Cart items table or total element not found');
+            return;
+        }
+
         cartItems.innerHTML = '';
         let total = 0;
 
         cart.forEach(item => {
             const row = document.createElement('tr');
             row.innerHTML = `
-                <td>${item.title}</td>
+                <td>${item.title || 'N/A'}</td>
                 <td><input type="number" value="${item.quantity}" min="1" onchange="updateCartItem('${item.barcode}', this.value)"></td>
-                <td>${item.price} VND</td>
-                <td><button onclick="removeCartItem('${item.barcode}')">Remove</button></td>
+                <td>${(item.price || 0).toFixed(2)} VND</td>
+                <td>${item.rushDelivery ? 'Yes' : 'No'}</td>
+                <td><button class="remove-btn" onclick="removeCartItem('${item.barcode}')">Remove</button></td>
             `;
             cartItems.appendChild(row);
-            total += item.price * item.quantity;
+            total += (item.price || 0) * item.quantity;
         });
 
-        document.getElementById('cart-total').textContent = `${total} VND`;
+        cartTotal.textContent = `Total (excl. VAT): ${total.toFixed(2)} VND`;
+
+        if (cartData.deficiencies && Object.keys(cartData.deficiencies).length > 0) {
+            deficiencyItems.innerHTML = '';
+            for (const [barcode, quantity] of Object.entries(cartData.deficiencies)) {
+                const product = cart.find(item => item.barcode === barcode);
+                const li = document.createElement('li');
+                li.textContent = `${product ? product.title : barcode}: Short by ${quantity} units`;
+                deficiencyItems.appendChild(li);
+            }
+            deficiencyDiv.style.display = 'block';
+        } else {
+            deficiencyDiv.style.display = 'none';
+        }
     } catch (error) {
+        console.error('Error loading cart:', error);
         alert('Error loading cart: ' + error.message);
+        const cartItems = document.querySelector('#cart-items tbody');
+        if (cartItems) cartItems.innerHTML = '<tr><td colspan="5">Error loading cart</td></tr>';
     }
 }
 
-/* Cập nhật số lượng sản phẩm trong giỏ hàng */
 async function updateCartItem(barcode, quantity) {
     quantity = parseInt(quantity);
     if (quantity <= 0) {
-        removeCartItem(barcode);
+        await removeCartItem(barcode);
         return;
     }
 
     try {
-        // Xóa item hiện tại
-        await fetch(`http://localhost:8080/api/carts/${sessionId}/items/${barcode}`, {
+        await fetch(`/api/carts/${sessionId}/items/${barcode}`, {
             method: 'DELETE',
             headers: {
                 'Authorization': 'Bearer ' + (localStorage.getItem('token') || '')
             }
         });
-        // Thêm lại với số lượng mới
-        await fetch(`http://localhost:8080/api/carts/${sessionId}/items`, {
+
+        await fetch(`/api/carts/${sessionId}/items`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -103,54 +96,75 @@ async function updateCartItem(barcode, quantity) {
 
         await loadCart();
     } catch (error) {
+        console.error('Error updating cart item:', error);
         alert('Error updating cart item: ' + error.message);
     }
 }
 
-/* Xóa một sản phẩm khỏi giỏ hàng */
 async function removeCartItem(barcode) {
     try {
-        const response = await fetch(`http://localhost:8080/api/carts/${sessionId}/items/${barcode}`, {
+        console.log(`Removing item: barcode=${barcode}, sessionId=${sessionId}`);
+        const response = await fetch(`/api/carts/${sessionId}/items/${barcode}`, {
             method: 'DELETE',
             headers: {
                 'Authorization': 'Bearer ' + (localStorage.getItem('token') || '')
             }
         });
-        if (!response.ok) throw new Error('Failed to remove cart item.');
+        if (!response.ok) throw new Error(`Failed to remove cart item: ${response.status}`);
         await loadCart();
     } catch (error) {
+        console.error('Error removing cart item:', error);
         alert('Error removing cart item: ' + error.message);
     }
 }
 
-/* Xóa toàn bộ giỏ hàng */
 async function clearCart() {
     try {
-        const response = await fetch(`http://localhost:8080/api/carts/clear/${sessionId}`, {
+        console.log(`Clearing cart for sessionId: ${sessionId}`);
+        const response = await fetch(`/api/carts/clear/${sessionId}`, {
             method: 'DELETE',
             headers: {
                 'Authorization': 'Bearer ' + (localStorage.getItem('token') || '')
             }
         });
-        if (!response.ok) throw new Error('Failed to clear cart.');
+        if (!response.ok) throw new Error(`Failed to clear cart: ${response.status}`);
         await loadCart();
+        alert('Cart cleared successfully.');
     } catch (error) {
+        console.error('Error clearing cart:', error);
         alert('Error clearing cart: ' + error.message);
     }
 }
 
-/* Chuyển hướng sang trang đặt hàng nếu còn hàng */
 async function checkStockAndProceed() {
     try {
-        if (cart.length > 0) {
-            navigateTo('/pages/customer/order.html');
-        } else {
+        console.log(`Checking stock for sessionId: ${sessionId}`);
+        const response = await fetch(`/api/carts/${sessionId}`, {
+            headers: {
+                'Authorization': 'Bearer ' + (localStorage.getItem('token') || '')
+            }
+        });
+        if (!response.ok) throw new Error(`Failed to fetch cart: ${response.status}`);
+        const cartData = await response.json();
+
+        if (cartData.items.length === 0) {
             alert('Cart is empty.');
+            return;
         }
+
+        if (cartData.deficiencies && Object.keys(cartData.deficiencies).length > 0) {
+            alert('Please resolve stock deficiencies before proceeding.');
+            return;
+        }
+
+        navigateTo('/pages/customer/order.html');
     } catch (error) {
+        console.error('Error checking cart:', error);
         alert('Error checking cart: ' + error.message);
     }
 }
 
-// Khi trang cart.html load, gọi loadCart
-document.addEventListener('DOMContentLoaded', loadCart);
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('Cart page loaded');
+    loadCart();
+});

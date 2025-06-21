@@ -41,18 +41,28 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
-            throws ServletException, IOException {
-        String path = request.getRequestURI();
-        logger.debug("Processing request: {}", path);
 
-        // Thêm đoạn mã mới tại đây
+            throws ServletException, IOException {
+        logger.debug("Request URI: " + request.getRequestURI());
+        logger.debug("Request Method: " + request.getMethod());
+        logger.debug("Is Public API: " + isPublicApi(request));
+
+        String path = request.getRequestURI();
+        String method = request.getMethod();
+
+        String header = request.getHeader("Authorization");
+        //logger.debug("Processing request: {} {}", method, path);
+        //logger.debug("Authorization header: {}", header);
+        logger.debug("Request Path: " + request.getRequestURI());
+        logger.debug("Request Method: " + request.getMethod());
+        logger.debug("Header Authorization: " + request.getHeader("Authorization"));
+
         if (isPublicApi(request)) {
-            logger.debug("Skipping JWT filter for public API: {}, method: {}", path, request.getMethod());
+            logger.debug("Skipping JWT check for public API: {}", path);
             chain.doFilter(request, response);
             return;
         }
 
-        String header = request.getHeader("Authorization");
         if (header != null && header.startsWith("Bearer ")) {
             String token = header.substring(7);
             try {
@@ -67,34 +77,47 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     UserDetails userDetails = userDetailsService.loadUserByUsername(username);
                     if (userDetails != null) {
                         UsernamePasswordAuthenticationToken authentication =
-                                new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                                new UsernamePasswordAuthenticationToken(
+                                        userDetails, null, userDetails.getAuthorities());
                         SecurityContextHolder.getContext().setAuthentication(authentication);
                         logger.debug("Authenticated user: {}", username);
                     }
                 }
             } catch (Exception e) {
                 logger.warn("Invalid JWT token: {}", e.getMessage());
-                // Không chặn request, cho tiếp tục như anonymous user
+                // Cho phép tiếp tục như anonymous
             }
         }
 
-        // Không có token, hoặc token lỗi → vẫn cho qua
         chain.doFilter(request, response);
     }
 
     private boolean isPublicApi(HttpServletRequest request) {
         String path = request.getRequestURI();
-        return path.startsWith("/api/carts")
-                || path.startsWith("/api/products")
-                || path.startsWith("/api/cart")
-                || path.startsWith("/api/auth")
-                || path.startsWith("/api/orders")
-                || path.startsWith("/api/payments")
-                || path.startsWith("/pages/")
-                || path.startsWith("/js/")
-                || path.startsWith("/css/")
-                || path.equals("/role-selection.html")
-                || path.equals("/index.html");
+        String method = request.getMethod();
+        System.out.println("DEBUG PATH: " + path);
+        System.out.println("/api/carts/guest_123/items".matches("^/api/carts/[^/]+/items$")); // true
+        System.out.println("/api/carts//items".matches("^/api/carts/[^/]+/items$"));          // false
+        System.out.println("Current match: " + path.matches("^/api/carts/[^/]+/items$"));
+        // Cho phép tất cả request OPTIONS (CORS preflight)
+        if ("OPTIONS".equalsIgnoreCase(method)) return true;
+
+        // Cho phép thêm item vào giỏ với sessionId bất kỳ
+        if ("POST".equalsIgnoreCase(method) && path.matches("^/api/carts/[^/]+/items$")) {
+            return true;
+        }
+
+        // Các endpoint công khai khác
+        return path.startsWith("/api/auth") ||
+                path.startsWith("/api/products") ||
+                path.startsWith("/api/orders") ||
+                path.startsWith("/api/payments") ||
+                path.startsWith("/pages/") ||
+                path.startsWith("/js/") ||
+                path.startsWith("/css/") ||
+                path.equals("/favicon.ico") ||
+                path.equals("/index.html") ||
+                path.equals("/role-selection.html");
     }
 
     public String generateToken(UserDetails userDetails) {
