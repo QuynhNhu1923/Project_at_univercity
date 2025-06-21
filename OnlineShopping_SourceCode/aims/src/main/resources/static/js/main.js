@@ -13,7 +13,6 @@ if (!sessionId) {
     localStorage.setItem('sessionId', sessionId);
 }
 
-let cart = localStorage.getItem('cart') ? JSON.parse(localStorage.getItem('cart')) : [];
 let selectedProduct = null;
 
 /* Lấy số trang hiện tại */
@@ -33,7 +32,7 @@ function initApp() {
 
     if (path.includes('dashboard.html')) {
         console.log('Initializing dashboard...');
-        searchProducts(currentPage('products'), 'priceAsc', 'barcode', '');
+        searchProducts(currentPage('products'), 'priceAsc', 'title', '');
     } else if (path.includes('cart.html')) {
         loadCart();
     } else if (path.includes('orders.html')) {
@@ -53,19 +52,7 @@ function initApp() {
 
 document.addEventListener('DOMContentLoaded', initApp);
 
-// Hàm khởi tạo khi trang tải
-document.addEventListener('DOMContentLoaded', () => {
-    searchProducts(0, document.getElementById('sort-products').value || 'priceAsc',
-        document.getElementById('search-attribute').value || 'title',
-        document.getElementById('search-products').value || '');
-    // Gắn sự kiện cho nút "Search"
-    document.querySelector('button[onclick^="searchProducts"]')?.addEventListener('click', () => {
-        searchProducts(0, document.getElementById('sort-products').value || 'priceAsc',
-            document.getElementById('search-attribute').value || 'title',
-            document.getElementById('search-products').value || '');
-    });
-});
-
+// Hàm tìm kiếm sản phẩm
 function searchProducts(page = 0, sort = 'priceAsc', attribute = 'title', keyword = '') {
     updateCurrentPage('products', page);
     // Lấy giá trị từ input và attribute
@@ -118,6 +105,7 @@ function searchProducts(page = 0, sort = 'priceAsc', attribute = 'title', keywor
                         <div>Stock: ${product.quantity || '0'}</div>
                         <div>Rush Delivery: ${product.rush_delivery ? 'Yes' : 'No'}</div>
                         <button onclick="loadProductDetails('${product.barcode || ''}')">View</button>
+                        <button onclick="addToCart('${product.barcode || ''}', ${product.quantity || 0})">Add to Cart</button>
                     `;
                     grid.appendChild(item);
                 });
@@ -133,7 +121,6 @@ function searchProducts(page = 0, sort = 'priceAsc', attribute = 'title', keywor
         });
 }
 
-
 /* Hàm cập nhật nút phân trang */
 function updatePagination(totalPages, currentPage) {
     const prevButton = document.querySelector('.pagination button:first-child');
@@ -147,10 +134,11 @@ function updatePagination(totalPages, currentPage) {
     nextButton.disabled = currentPage >= totalPages - 1;
 
     const sort = document.getElementById('sort-products')?.value || 'priceAsc';
+    const attribute = document.getElementById('search-attribute')?.value || 'title';
     const keyword = document.getElementById('search-products')?.value || '';
 
-    prevButton.onclick = () => searchProducts(currentPage - 1, sort, 'barcode', keyword);
-    nextButton.onclick = () => searchProducts(currentPage + 1, sort, 'barcode', keyword);
+    prevButton.onclick = () => searchProducts(currentPage - 1, sort, attribute, keyword);
+    nextButton.onclick = () => searchProducts(currentPage + 1, sort, attribute, keyword);
 }
 
 /* Hàm tải chi tiết sản phẩm */
@@ -172,6 +160,7 @@ function loadProductDetails(barcode) {
             grid.innerHTML = '';
             if (data.content?.length > 0) {
                 const product = data.content[0];
+                selectedProduct = product;
                 const item = document.createElement('div');
                 item.className = 'product-item';
                 item.innerHTML = `
@@ -180,6 +169,8 @@ function loadProductDetails(barcode) {
                     <div>Price: $${product.price?.toFixed(2) || '0.00'}</div>
                     <div>Stock: ${product.quantity || '0'}</div>
                     <div>Rush Delivery: ${product.rush_delivery ? 'Yes' : 'No'}</div>
+                    <input type="number" id="product-quantity" min="1" max="${product.quantity}" value="1">
+                    <button onclick="addToCartFromDetails()">Add to Cart</button>
                     <button onclick="initApp()">Back</button>
                 `;
                 grid.appendChild(item);
@@ -195,39 +186,158 @@ function loadProductDetails(barcode) {
         });
 }
 
+/* Hàm thêm vào giỏ hàng từ chi tiết sản phẩm */
+function addToCartFromDetails() {
+    const quantity = parseInt(document.getElementById('product-quantity').value);
+    if (!selectedProduct || quantity <= 0 || quantity > selectedProduct.quantity) {
+        alert('Invalid quantity.');
+        return;
+    }
+    addToCart(selectedProduct.barcode, quantity);
+}
+
+// Hàm lấy hoặc tạo sessionId từ cookie
+function getSessionId() {
+    const name = 'sessionId=';
+    const decodedCookie = decodeURIComponent(document.cookie);
+    const ca = decodedCookie.split(';');
+    for (let i = 0; i < ca.length; i++) {
+        let c = ca[i].trim();
+        if (c.indexOf(name) === 0) {
+            return c.substring(name.length, c.length);
+        }
+    }
+    // Tạo sessionId ngẫu nhiên nếu không có
+    const newSessionId = 'guest_' + Math.random().toString(36).substr(2, 9);
+    document.cookie = `sessionId=${newSessionId}; path=/; max-age=86400`; // Hết hạn sau 24 giờ
+    return newSessionId;
+}
+
+// Hàm addToCart
+async function addToCart(barcode, quantity) {
+    const sessionId = getSessionId();
+    const headers = {
+        'Content-Type': 'application/json'
+        // Không thêm Authorization
+    };
+    const body = { barcode, quantity };
+
+    try {
+        const response = await fetch(`/api/carts/${sessionId}/items?barcode=${barcode}&quantity=${quantity}`, {
+            method: 'POST',
+            headers: headers,
+            body: JSON.stringify(body)
+        });
+        const data = await response.json();
+        if (!response.ok) {
+            throw new Error(`Failed to add to cart. Status: ${response.status}, Message: ${data.message || ''}`);
+        }
+        console.log('✅ Added to cart:', data);
+    } catch (error) {
+        console.error('❌ Failed to add to cart:', error);
+        alert('Failed to add to cart');
+    }
+}
+
+// Gán sự kiện cho nút
+document.querySelectorAll('.add-to-cart').forEach(button => {
+    button.addEventListener('click', () => {
+        const barcode = button.getAttribute('data-barcode');
+        const quantity = 1; // Hoặc lấy từ input nếu có
+        addToCart(barcode, quantity);
+    });
+});
+
+/* Hàm cập nhật số lượng giỏ hàng trên giao diện */
+async function updateCartCount() {
+    try {
+        const response = await fetch(`http://localhost:8080/api/carts/${sessionId}`, {
+            headers: {
+                'Authorization': 'Bearer ' + (localStorage.getItem('token') || '')
+            }
+        });
+        if (!response.ok) throw new Error('Failed to fetch cart.');
+        const cartData = await response.json();
+        const cartCount = cartData.items.reduce((sum, item) => sum + item.quantity, 0);
+        const cartButton = document.querySelector('button[onclick^="navigateTo(\'/pages/customer/cart.html\'"]');
+        if (cartButton) {
+            cartButton.textContent = `View Cart (${cartCount})`;
+        }
+    } catch (error) {
+        console.error('Error updating cart count:', error);
+    }
+}
+
 /* Hàm tải giỏ hàng */
 function loadCart() {
     console.log("Loading cart...");
-    fetch(`/api/carts/${sessionId}`)
-        .then(response => response.json())
+    fetch(`/api/carts/${sessionId}`, {
+        headers: {
+            'Authorization': 'Bearer ' + (localStorage.getItem('token') || '')
+        }
+    })
+        .then(response => {
+            if (!response.ok) throw new Error(`Network error: ${response.status}`);
+            return response.json();
+        })
         .then(data => {
             const grid = document.getElementById('product-grid');
             grid.innerHTML = '';
-            data.items.forEach(item => {
-                const itemDiv = document.createElement('div');
-                itemDiv.className = 'product-item';
-                itemDiv.innerHTML = `
-                    <div>Name: ${item.title}</div>
-                    <div>Type: ${item.category}</div>
-                    <div>Price: $${item.price.toFixed(2)}</div>
-                    <div>Stock: ${item.quantity}</div>
-                    <div>Rush Delivery: N/A</div>
-                    <button>Remove</button>
-                `;
-                grid.appendChild(itemDiv);
-            });
+            if (data.items && data.items.length > 0) {
+                data.items.forEach(item => {
+                    const itemDiv = document.createElement('div');
+                    itemDiv.className = 'product-item';
+                    itemDiv.innerHTML = `
+                        <div>Name: ${item.productName || 'N/A'}</div>
+                        <div>Type: ${item.category || 'N/A'}</div>
+                        <div>Price: $${(item.price || 0).toFixed(2)}</div>
+                        <div>Quantity: ${item.quantity}</div>
+                        <div>Rush Delivery: ${item.rushSupported ? 'Supported' : 'Not Supported'}</div>
+                        <button onclick="removeCartItem('${item.barcode}')">Remove</button>
+                    `;
+                    grid.appendChild(itemDiv);
+                });
+            } else {
+                grid.innerHTML = '<div>Cart is empty</div>';
+            }
             console.log("Cart loaded:", data);
+            updateCartCount();
         })
-        .catch(error => console.error("Error loading cart:", error));
+        .catch(error => {
+            console.error("Error loading cart:", error);
+            const grid = document.getElementById('product-grid');
+            if (grid) grid.innerHTML = `<div>Error loading cart: ${error.message}</div>`;
+        });
 }
 
-/* Các hàm còn lại giữ nguyên */
+/* Hàm xóa mục khỏi giỏ hàng */
+async function removeCartItem(barcode) {
+    try {
+        const response = await fetch(`http://localhost:8080/api/carts/${sessionId}/items/${barcode}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': 'Bearer ' + (localStorage.getItem('token') || '')
+            }
+        });
+        if (!response.ok) throw new Error('Failed to remove cart item.');
+        const cartData = await response.json();
+        loadCart();
+    } catch (error) {
+        alert('Error removing cart item: ' + error.message);
+    }
+}
+
+/* Các hàm còn lại */
 function loadCustomerOrders() {
     console.log("Loading customer orders...");
     const email = prompt("Enter customer email:");
     if (!email) return;
 
-    fetch(`/api/orders?email=${email}`)
+    fetch(`/api/orders?email=${email}`, {
+        headers: {
+            'Authorization': 'Bearer ' + (localStorage.getItem('token') || '')
+        }
+    })
         .then(response => response.json())
         .then(data => {
             const grid = document.getElementById('product-grid');
@@ -252,7 +362,11 @@ function loadCustomerOrders() {
 
 function loadProductManagerList() {
     console.log("Loading product manager list...");
-    fetch('/api/products')
+    fetch('/api/products', {
+        headers: {
+            'Authorization': 'Bearer ' + (localStorage.getItem('token') || '')
+        }
+    })
         .then(response => response.json())
         .then(data => {
             const grid = document.getElementById('product-grid');
@@ -277,7 +391,11 @@ function loadProductManagerList() {
 
 function loadPendingOrders() {
     console.log("Loading pending orders...");
-    fetch('/api/orders?status=pending')
+    fetch('/api/orders?status=pending', {
+        headers: {
+            'Authorization': 'Bearer ' + (localStorage.getItem('token') || '')
+        }
+    })
         .then(response => response.json())
         .then(data => {
             const grid = document.getElementById('product-grid');
@@ -302,7 +420,11 @@ function loadPendingOrders() {
 
 function loadUserList() {
     console.log("Loading user list...");
-    fetch('/api/users')
+    fetch('/api/users', {
+        headers: {
+            'Authorization': 'Bearer ' + (localStorage.getItem('token') || '')
+        }
+    })
         .then(response => response.json())
         .then(data => {
             const grid = document.getElementById('product-grid');

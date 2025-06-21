@@ -1,52 +1,45 @@
 package com.aims.model;
 
 import java.io.Serializable;
-import java.util.Objects;
 
 public class CartItemId implements Serializable {
+    private String sessionId;
+    private String barcode;
 
-    private String cart; // sessionId từ Cart
-    private String product; // productBarcode từ Product
+    public CartItemId() {}
 
-    // Constructor rỗng (yêu cầu bởi Hibernate)
-    public CartItemId() {
+    public CartItemId(String sessionId, String barcode) {
+        this.sessionId = sessionId;
+        this.barcode = barcode;
     }
 
-    // Constructor đầy đủ
-    public CartItemId(String cart, String product) {
-        this.cart = cart;
-        this.product = product;
+    // Getters, Setters, equals, hashCode
+    public String getSessionId() {
+        return sessionId;
     }
 
-    // Getter và Setter
-    public String getCart() {
-        return cart;
+    public void setSessionId(String sessionId) {
+        this.sessionId = sessionId;
     }
 
-    public void setCart(String cart) {
-        this.cart = cart;
+    public String getBarcode() {
+        return barcode;
     }
 
-    public String getProduct() {
-        return product;
+    public void setBarcode(String barcode) {
+        this.barcode = barcode;
     }
 
-    public void setProduct(String product) {
-        this.product = product;
-    }
-
-    // Triển khai equals() và hashCode()
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         CartItemId that = (CartItemId) o;
-        return Objects.equals(cart, that.cart) &&
-                Objects.equals(product, that.product);
+        return sessionId.equals(that.sessionId) && barcode.equals(that.barcode);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(cart, product);
+        return 31 * sessionId.hashCode() + barcode.hashCode();
     }
 }

@@ -1,42 +1,62 @@
 package com.aims.model;
 
 import jakarta.persistence.*;
-import java.util.Objects;
 
 @Entity
 @Table(name = "cart_items")
 @IdClass(CartItemId.class)
 public class CartItem {
+    @Id
+    @Column(name = "session_id")
+    private String sessionId;
 
     @Id
-    @ManyToOne
-    @JoinColumn(name = "cart_id")
+    @Column(name = "barcode")
+    private String barcode;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "session_id", insertable = false, updatable = false)
     private Cart cart;
 
-    @Id
-    @ManyToOne
-    @JoinColumn(name = "product_barcode")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "barcode", insertable = false, updatable = false)
     private Product product;
 
+    @Column(name = "quantity")
     private int quantity;
+    public CartItem() {}
 
-    // Constructor rỗng
-    public CartItem() {
-    }
-
-    // Constructor đầy đủ
     public CartItem(Cart cart, Product product, int quantity) {
+        this.sessionId = cart.getSessionId();
+        this.barcode = product.getBarcode();
         this.cart = cart;
         this.product = product;
         this.quantity = quantity;
     }
 
-    // Getter và Setter
+    // Getters and Setters
+    public String getSessionId() {
+        return sessionId;
+    }
+
+    public void setSessionId(String sessionId) {
+        this.sessionId = sessionId;
+    }
+
+    public String getBarcode() {
+        return barcode;
+    }
+
+    public void setBarcode(String barcode) {
+        this.barcode = barcode;
+    }
+
     public Cart getCart() {
         return cart;
     }
 
     public void setCart(Cart cart) {
+        this.sessionId = cart.getSessionId();
         this.cart = cart;
     }
 
@@ -45,6 +65,7 @@ public class CartItem {
     }
 
     public void setProduct(Product product) {
+        this.barcode = product.getBarcode();
         this.product = product;
     }
 
@@ -56,18 +77,12 @@ public class CartItem {
         this.quantity = quantity;
     }
 
-    // Triển khai equals() và hashCode() cho entity (tùy chọn, nhưng tốt hơn là có)
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        CartItem cartItem = (CartItem) o;
-        return Objects.equals(cart, cartItem.cart) &&
-                Objects.equals(product, cartItem.product);
+    public CartItemId getId() {
+        return new CartItemId(sessionId, barcode);
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(cart, product);
+    public void setId(CartItemId id) {
+        this.sessionId = id.getSessionId();
+        this.barcode = id.getBarcode();
     }
 }

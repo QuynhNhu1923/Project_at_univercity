@@ -1,104 +1,153 @@
+package com.aims.service; // Thay bằng package thực tế của bạn
 
-package com.aims.service;
-
-import com.aims.model.Cart;
-import com.aims.model.CartItem;
-import com.aims.model.Product;
-import com.aims.repository.CartRepository;
-import com.aims.repository.ProductRepository;
-import jakarta.transaction.Transactional;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import com.aims.model.Cart;
+import com.aims.model.CartItem;
+import com.aims.model.CartItemId;
+import com.aims.model.Product;
+import com.aims.repository.CartItemRepository;
+import com.aims.repository.CartRepository;
+import com.aims.repository.ProductRepository;
+
+import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Optional;
 
 @Service
-@Transactional
 public class CartService {
+
     private static final Logger logger = LoggerFactory.getLogger(CartService.class);
+
+    @PersistenceContext
+    private EntityManager entityManager;
 
     @Autowired
     private CartRepository cartRepository;
 
     @Autowired
+    private CartItemRepository cartItemRepository;
+
+    @Autowired
     private ProductRepository productRepository;
 
-    public Cart getOrCreateCart(String sessionId) {
-        logger.info("Getting or creating cart for session: {}", sessionId);
-        Optional<Cart> cart = cartRepository.findBySessionId(sessionId);
-        if (cart.isPresent()) {
-            logger.info("Found existing cart: {}", sessionId);
-            return cart.get();
-        }
-
-        Cart newCart = new Cart();
-        newCart.setSessionId(sessionId);
-        Cart savedCart = cartRepository.save(newCart);
-        logger.info("Created new cart: {}", sessionId);
-        return savedCart;
-    }
-
+    @Transactional
     public Cart addToCart(String sessionId, String barcode, int quantity) {
-        logger.info("Adding product {} to cart {} with quantity {}", barcode, sessionId, quantity);
+        try {
+            if (quantity <= 0) {
+                throw new IllegalArgumentException("Quantity must be greater than 0");
+            }
+
+            Product product = productRepository.findById(barcode)
+                    .orElseThrow(() -> new IllegalArgumentException("Product not found: " + barcode));
+
+            if (product.getQuantity() < quantity) {
+                throw new IllegalArgumentException("Insufficient quantity in stock for barcode: " + barcode);
+            }
+
+            Cart cart = getOrCreateCart(sessionId);
+            if (cart.getSessionId() == null) {
+                throw new IllegalStateException("Cart session ID is null");
+            }
+
+            CartItemId itemId = new CartItemId(cart.getSessionId(), barcode);
+            Optional<CartItem> existingItem = cartItemRepository.findById(itemId);
+
+            CartItem item;
+            if (existingItem.isPresent()) {
+                item = existingItem.get();
+                int newQuantity = item.getQuantity() + quantity;
+                if (newQuantity > product.getQuantity()) {
+                    throw new IllegalArgumentException("Requested quantity exceeds available stock for barcode: " + barcode);
+                }
+                item.setQuantity(newQuantity);
+            } else {
+                item = new CartItem(cart, product, quantity);
+                cart.getCartItems().add(item);
+            }
+
+            item = entityManager.merge(item);
+            cartItemRepository.save(item);
+
+            product.setQuantity(product.getQuantity() - quantity);
+            product.setUpdatedAt(LocalDateTime.now());
+            productRepository.save(product);
+
+            cartRepository.save(cart);
+
+            logger.info("Added to cart - sessionId: {}, barcode: {}, quantity: {}", sessionId, barcode, quantity);
+            return cart;
+        } catch (Exception e) {
+            logger.error("Error adding to cart - sessionId: {}, barcode: {}, quantity: {}, error: {}", sessionId, barcode, quantity, e.getMessage());
+            throw e;
+        }
+    }
+
+    @Transactional(readOnly = true)
+    public Cart getOrCreateCart(String sessionId) {
+        return cartRepository.findById(sessionId).orElseGet(() -> {
+            Cart cart = new Cart(sessionId);
+            return cartRepository.save(cart);
+        });
+    }
+
+    @Transactional
+    public Cart getCart(String sessionId) {
         Cart cart = getOrCreateCart(sessionId);
-        Product product = productRepository.findByBarcode(barcode);
-        if (product == null) {
-            logger.error("Product not found: {}", barcode);
-            throw new IllegalArgumentException("Product not found");
-        }
-        if (quantity <= 0 || quantity > product.getQuantity()) {
-            logger.error("Invalid quantity for product {}: requested {}, available {}", barcode, quantity, product.getQuantity());
-            throw new IllegalArgumentException("Invalid quantity");
-        }
-
-        Optional<CartItem> existingItem = cart.getCartItems().stream()
-                .filter(item -> item.getProduct().getBarcode().equals(barcode))
-                .findFirst();
-
-        if (existingItem.isPresent()) {
-            CartItem cartItem = existingItem.get();
-            cartItem.setQuantity(cartItem.getQuantity() + quantity);
-            logger.info("Updated quantity for product {} in cart {}", barcode, sessionId);
-        } else {
-            CartItem cartItem = new CartItem();
-            //cartItem.setId(new CartItemId(sessionId, barcode));
-            cartItem.setCart(cart);
-            cartItem.setProduct(product);
-            cartItem.setQuantity(quantity);
-            cart.getCartItems().add(cartItem);
-            logger.info("Added new product {} to cart {}", barcode, sessionId);
-        }
-
-        Cart savedCart = cartRepository.save(cart);
-        return savedCart;
+        logger.info("Retrieved cart - sessionId: {}", sessionId);
+        return cart;
     }
 
+    @Transactional
     public Cart removeFromCart(String sessionId, String barcode) {
-        logger.info("Removing product {} from cart {}", barcode, sessionId);
-        Cart cart = cartRepository.findBySessionId(sessionId)
-                .orElseThrow(() -> {
-                    logger.error("Cart not found: {}", sessionId);
-                    return new IllegalArgumentException("Cart not found");
-                });
+        try {
+            Cart cart = getOrCreateCart(sessionId);
+            CartItemId itemId = new CartItemId(sessionId, barcode);
+            Optional<CartItem> existingItem = cartItemRepository.findById(itemId);
 
-        cart.getCartItems().removeIf(item -> item.getProduct().getBarcode().equals(barcode));
-        Cart savedCart = cartRepository.save(cart);
-        logger.info("Removed product {} from cart {}", barcode, sessionId);
-        return savedCart;
+            if (existingItem.isPresent()) {
+                CartItem item = existingItem.get();
+                Product product = item.getProduct();
+                int removedQuantity = item.getQuantity();
+                product.setQuantity(product.getQuantity() + removedQuantity); // Hoàn lại số lượng
+                product.setUpdatedAt(LocalDateTime.now());
+                productRepository.save(product);
+
+                cart.getCartItems().remove(item);
+                cartRepository.save(cart);
+                cartItemRepository.delete(item);
+
+                logger.info("Removed from cart - sessionId: {}, barcode: {}, quantity: {}", sessionId, barcode, removedQuantity);
+            } else {
+                logger.warn("CartItem not found - sessionId: {}, barcode: {}", sessionId, barcode);
+            }
+            return cart;
+        } catch (Exception e) {
+            logger.error("Error removing from cart - sessionId: {}, barcode: {}, error: {}", sessionId, barcode, e.getMessage());
+            throw e;
+        }
     }
 
-    public void clearCart(String sessionId) {
-        logger.info("Clearing cart: {}", sessionId);
-        Cart cart = cartRepository.findBySessionId(sessionId)
-                .orElseThrow(() -> {
-                    logger.error("Cart not found: {}", sessionId);
-                    return new IllegalArgumentException("Cart not found");
-                });
-
-        cart.getCartItems().clear();
-        cartRepository.save(cart);
-        logger.info("Cleared cart: {}", sessionId);
+    @Transactional
+    public Cart clearCart(String sessionId) {
+        try {
+            Cart cart = getOrCreateCart(sessionId);
+            if (!cart.getCartItems().isEmpty()) {
+                for (CartItem item : new HashSet<>(cart.getCartItems())) { // Sao chép để tránh ConcurrentModificationException
+                    removeFromCart(sessionId, item.getBarcode());
+                }
+            }
+            logger.info("Cleared cart - sessionId: {}", sessionId);
+            return cart;
+        } catch (Exception e) {
+            logger.error("Error clearing cart - sessionId: {}, error: {}", sessionId, e.getMessage());
+            throw e;
+        }
     }
 }

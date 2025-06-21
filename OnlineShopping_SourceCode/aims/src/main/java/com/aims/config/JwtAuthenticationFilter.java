@@ -23,6 +23,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
+
     private static final Logger logger = LoggerFactory.getLogger(JwtAuthenticationFilter.class);
 
     @Autowired
@@ -41,9 +42,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
-        logger.debug("Processing request: {}", request.getRequestURI());
-        if (isStaticResource(request)) {
-            logger.debug("Skipping JWT check for static resource: {}", request.getRequestURI());
+        String path = request.getRequestURI();
+        logger.debug("Processing request: {}", path);
+
+        // Thêm đoạn mã mới tại đây
+        if (isPublicApi(request)) {
+            logger.debug("Skipping JWT filter for public API: {}, method: {}", path, request.getMethod());
             chain.doFilter(request, response);
             return;
         }
@@ -62,30 +66,35 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                     UserDetails userDetails = userDetailsService.loadUserByUsername(username);
                     if (userDetails != null) {
-                        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                                userDetails, null, userDetails.getAuthorities());
+                        UsernamePasswordAuthenticationToken authentication =
+                                new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                         SecurityContextHolder.getContext().setAuthentication(authentication);
                         logger.debug("Authenticated user: {}", username);
-                    } else {
-                        logger.warn("User not found for username: {}", username);
                     }
                 }
             } catch (Exception e) {
                 logger.warn("Invalid JWT token: {}", e.getMessage());
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                response.getWriter().write("Invalid or expired token");
-                return;
+                // Không chặn request, cho tiếp tục như anonymous user
             }
-        } else {
-            logger.debug("No JWT token found in request");
         }
+
+        // Không có token, hoặc token lỗi → vẫn cho qua
         chain.doFilter(request, response);
     }
 
-    private boolean isStaticResource(HttpServletRequest request) {
+    private boolean isPublicApi(HttpServletRequest request) {
         String path = request.getRequestURI();
-        return path.startsWith("/pages/") || path.startsWith("/js/") || path.startsWith("/css/") ||
-                path.equals("/role-selection.html") || path.equals("/index.html");
+        return path.startsWith("/api/carts")
+                || path.startsWith("/api/products")
+                || path.startsWith("/api/cart")
+                || path.startsWith("/api/auth")
+                || path.startsWith("/api/orders")
+                || path.startsWith("/api/payments")
+                || path.startsWith("/pages/")
+                || path.startsWith("/js/")
+                || path.startsWith("/css/")
+                || path.equals("/role-selection.html")
+                || path.equals("/index.html");
     }
 
     public String generateToken(UserDetails userDetails) {

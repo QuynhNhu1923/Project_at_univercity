@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 import java.util.Date;
 
 @Entity
-@Table(name = "Products")
+@Table(name = "products")
 public class Product {
 
     @Id
@@ -16,7 +16,7 @@ public class Product {
     private String title;
 
     @Column(name = "category", nullable = false)
-    private String category; // Must be 'Book', 'CD', 'LP', or 'DVD'
+    private String category;
 
     @Column(name = "value", nullable = false)
     private Double value;
@@ -25,7 +25,7 @@ public class Product {
     private Double price;
 
     @Column(name = "quantity", nullable = false)
-    private Integer quantity = 0; // Default value as per schema
+    private Integer quantity = 0;
 
     @Column(name = "warehouse_entry_date", nullable = false)
     @Temporal(TemporalType.DATE)
@@ -41,7 +41,7 @@ public class Product {
     private String description;
 
     @Column(name = "condition", nullable = false)
-    private String condition; // Must be 'new' or 'used'
+    private String condition;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt = LocalDateTime.now();
@@ -49,7 +49,6 @@ public class Product {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt = LocalDateTime.now();
 
-    // Getters and setters
     public String getBarcode() {
         return barcode;
     }
