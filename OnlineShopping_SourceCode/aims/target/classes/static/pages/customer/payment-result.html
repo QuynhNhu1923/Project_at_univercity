@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Payment Result - AIMS</title>
+    <style>
+      body {
+        font-family: "Arial", sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        margin: 0;
+        padding: 20px;
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: #333;
+      }
+
+      .container {
+        max-width: 600px;
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+        overflow: hidden;
+        text-align: center;
+      }
+
+      .header {
+        padding: 40px 30px 30px;
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        color: white;
+      }
+
+      .header.success {
+        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+      }
+
+      .header.failed {
+        background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+      }
+
+      .icon {
+        font-size: 4rem;
+        margin-bottom: 20px;
+        display: block;
+      }
+
+      .header h1 {
+        margin: 0;
+        font-size: 2rem;
+        font-weight: 300;
+        letter-spacing: 1px;
+      }
+
+      .content {
+        padding: 40px 30px;
+      }
+
+      .result-info {
+        background: #f8f9fa;
+        border-radius: 12px;
+        padding: 25px;
+        margin: 20px 0;
+        text-align: left;
+      }
+
+      .info-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 0;
+        border-bottom: 1px solid #e9ecef;
+      }
+
+      .info-row:last-child {
+        border-bottom: none;
+      }
+
+      .info-label {
+        font-weight: 600;
+        color: #6c757d;
+      }
+
+      .info-value {
+        font-weight: 500;
+        color: #212529;
+      }
+
+      .amount {
+        font-size: 1.2rem;
+        color: #28a745;
+        font-weight: bold;
+      }
+
+      .error-amount {
+        color: #dc3545;
+      }
+
+      .actions {
+        margin-top: 30px;
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+
+      .btn {
+        padding: 12px 25px;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-block;
+        min-width: 140px;
+      }
+
+      .btn-primary {
+        background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+        color: white;
+      }
+
+      .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+      }
+
+      .btn-secondary {
+        background: linear-gradient(90deg, #6c757d 0%, #545862 100%);
+        color: white;
+      }
+
+      .btn-secondary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(108, 117, 125, 0.3);
+      }
+
+      .btn-success {
+        background: linear-gradient(90deg, #28a745 0%, #20c997 100%);
+        color: white;
+      }
+
+      .btn-success:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(40, 167, 69, 0.3);
+      }
+
+      .loading {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        padding: 60px 30px;
+      }
+
+      .spinner {
+        width: 50px;
+        height: 50px;
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid #667eea;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin-bottom: 20px;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      .hidden {
+        display: none;
+      }
+
+      @media (max-width: 768px) {
+        .container {
+          margin: 10px;
+          max-width: none;
+        }
+
+        .content {
+          padding: 20px;
+        }
+
+        .actions {
+          flex-direction: column;
+        }
+
+        .btn {
+          width: 100%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <!-- Loading State -->
+      <div id="loading-state" class="loading">
+        <div class="spinner"></div>
+        <h2>Processing Payment Result...</h2>
+        <p>Please wait while we verify your payment.</p>
+      </div>
+
+      <!-- Success State -->
+      <div id="success-state" class="hidden">
+        <div class="header success">
+          <span class="icon">✅</span>
+          <h1>Payment Successful!</h1>
+        </div>
+
+        <div class="content">
+          <p>
+            Thank you for your order! Your payment has been processed
+            successfully.
+          </p>
+
+          <div class="result-info">
+            <div class="info-row">
+              <span class="info-label">Order ID:</span>
+              <span class="info-value" id="success-order-id">-</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">Transaction ID:</span>
+              <span class="info-value" id="success-transaction-id">-</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">Amount Paid:</span>
+              <span class="info-value amount" id="success-amount">-</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">Status:</span>
+              <span class="info-value" style="color: #28a745">Confirmed</span>
+            </div>
+          </div>
+
+          <p>
+            A confirmation email has been sent to your email address. You can
+            track your order status using your order ID.
+          </p>
+
+          <div class="actions">
+            <a href="/pages/customer/orders.html" class="btn btn-primary"
+              >View My Orders</a
+            >
+            <a href="/pages/customer/customer-dashboard.html" class="btn btn-success"
+              >Continue Shopping</a
+            >
+          </div>
+        </div>
+      </div>
+
+      <!-- Failed State -->
+      <div id="failed-state" class="hidden">
+        <div class="header failed">
+          <span class="icon">❌</span>
+          <h1>Payment Failed</h1>
+        </div>
+
+        <div class="content">
+          <p>
+            Unfortunately, your payment could not be processed. Please try again
+            or contact support.
+          </p>
+
+          <div class="result-info">
+            <div class="info-row">
+              <span class="info-label">Order ID:</span>
+              <span class="info-value" id="failed-order-id">-</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">Error Code:</span>
+              <span class="info-value" id="failed-error-code">-</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">Status:</span>
+              <span class="info-value" style="color: #dc3545"
+                >Payment Failed</span
+              >
+            </div>
+          </div>
+
+          <div class="actions">
+            <a href="/pages/customer/cart.html" class="btn btn-primary"
+              >Try Again</a
+            >
+            <a href="/pages/customer/customer-dashboard.html" class="btn btn-secondary"
+              >Back to Shopping</a
+            >
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        handlePaymentResult();
+      });
+
+      async function handlePaymentResult() {
+        try {
+          // Get URL parameters
+          const urlParams = new URLSearchParams(window.location.search);
+          const params = {};
+          for (const [key, value] of urlParams) {
+            params[key] = value;
+          }
+
+          console.log("Payment return parameters:", params);
+
+          // Check if we have VNPay return parameters
+          if (!params.vnp_TxnRef || !params.vnp_ResponseCode) {
+            throw new Error("Invalid payment return parameters");
+          }
+
+          // Send to backend for verification
+          const response = await fetch(
+            "/api/orders/payment-return?" + urlParams.toString(),
+            {
+              method: "GET",
+              headers: {
+                "Content-Type": "application/json",
+              },
+            }
+          );
+
+          const result = await response.json();
+          console.log("Payment processing result:", result);
+
+          // Hide loading state
+          document.getElementById("loading-state").classList.add("hidden");
+
+          if (result.success) {
+            showSuccessState(result);
+          } else {
+            showFailedState(result, params);
+          }
+        } catch (error) {
+          console.error("Error processing payment result:", error);
+          document.getElementById("loading-state").classList.add("hidden");
+          showFailedState({ error: error.message }, {});
+        }
+      }
+
+      function showSuccessState(result) {
+        const successState = document.getElementById("success-state");
+
+        // Update order information
+        document.getElementById("success-order-id").textContent =
+          result.orderId || "-";
+        document.getElementById("success-transaction-id").textContent =
+          result.transactionId || "-";
+
+        // Update amount (this should come from the order details)
+        const amount =
+          parseFloat(
+            new URLSearchParams(window.location.search).get("vnp_Amount")
+          ) / 100;
+        document.getElementById("success-amount").textContent =
+          formatCurrency(amount);
+
+        successState.classList.remove("hidden");
+
+        // Store order email for order tracking
+        const orderEmail = localStorage.getItem("orderEmail");
+        if (orderEmail) {
+          sessionStorage.setItem("orderEmail", orderEmail);
+        }
+
+        // Clear cart and pending order data
+        localStorage.removeItem("cart");
+        localStorage.removeItem("pendingOrderId");
+      }
+
+      function showFailedState(result, params) {
+        const failedState = document.getElementById("failed-state");
+
+        // Update error information
+        document.getElementById("failed-order-id").textContent =
+          result.orderId || params.vnp_TxnRef || "-";
+        document.getElementById("failed-error-code").textContent =
+          result.errorCode || params.vnp_ResponseCode || "Unknown";
+
+        failedState.classList.remove("hidden");
+      }
+
+      function formatCurrency(amount) {
+        return (
+          new Intl.NumberFormat("vi-VN", {
+            style: "decimal",
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0,
+          }).format(amount || 0) + " VND"
+        );
+      }
+
+      // Auto-redirect after successful payment (optional)
+      function autoRedirect() {
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get("vnp_ResponseCode") === "00") {
+          setTimeout(() => {
+            window.location.href = "/pages/customer/orders.html";
+          }, 5000); // Redirect after 5 seconds
+        }
+      }
+    </script>
+  </body>
+</html>

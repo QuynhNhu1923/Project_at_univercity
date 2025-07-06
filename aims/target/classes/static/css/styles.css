@@ -1,0 +1,266 @@
+/* Định dạng chung cho ứng dụng */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f9f9f9;
+    display: flex;
+    justify-content: center;
+    align-items: stretch;
+    min-height: 100vh;
+    width: 100vw;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.container {
+    width: 1200px; /* Giới hạn chiều rộng phù hợp với laptop */
+    max-width: 100%; /* Đảm bảo không tràn trên màn hình nhỏ */
+    min-height: 100vh;
+    margin: 0 auto; /* Căn giữa container */
+    padding: 1.5rem;
+    background-color: #fff;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow: auto;
+}
+
+.hidden {
+    display: none;
+}
+
+.section {
+    margin-bottom: 1rem;
+}
+
+.error {
+    color: red;
+}
+
+button {
+    margin: 0.25rem;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 0.25rem;
+    font-size: 1rem;
+    transition: background-color 0.3s;
+    min-width: 120px; /* Giảm độ rộng nút */
+}
+
+button:hover {
+    background-color: #45a049;
+}
+
+input, select, textarea {
+    margin: 0.25rem;
+    padding: 0.5rem;
+    border: 1px solid #ddd;
+    border-radius: 0.25rem;
+    font-size: 1rem;
+    width: 100%;
+    max-width: 250px; /* Giảm giới hạn chiều rộng */
+    box-sizing: border-box;
+}
+
+/* Xóa định dạng table vì không còn dùng */
+table {
+    display: none;
+}
+
+/* Định dạng lưới sản phẩm */
+#product-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr); /* 4 cột */
+    gap: 1.2rem; /* Giảm khoảng cách để cân đối */
+    max-height: 600px; /* Điều chỉnh chiều cao cho laptop */
+    overflow-y: auto;
+    overflow-x: hidden;
+    width: 100%;
+    padding: 1rem 0;
+    margin-top: 1rem;
+}
+
+.product-item {
+    border: 1px solid #ddd;
+    padding: 1.2rem; /* Giảm padding để cân đối */
+    text-align: left;
+    background: #fff;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 180px; /* Giảm chiều cao tối thiểu */
+}
+
+.product-item div {
+    margin-bottom: 0.5rem; /* Giảm khoảng cách giữa các dòng */
+    font-size: 1rem; /* Giảm kích thước chữ */
+}
+
+.product-item div::before {
+    content: attr(data-label);
+    font-weight: bold;
+    margin-right: 0.5rem;
+}
+
+.product-item div {
+    display: flex;
+    align-items: center;
+}
+
+.product-item button {
+    margin: 0;
+    padding: 0.4rem 0.8rem; /* Giảm padding nút */
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 0.25rem;
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+.product-item button:hover {
+    background-color: #45a049;
+}
+
+.pagination {
+    margin-top: 1rem;
+    text-align: center;
+    padding-bottom: 1rem;
+}
+
+.pagination button {
+    padding: 0.4rem 0.8rem; /* Giảm padding */
+    margin: 0 0.5rem;
+    font-size: 1rem;
+}
+
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.form-group label {
+    display: inline-block;
+    width: 15%;
+    text-align: right;
+    margin-right: 1rem;
+    font-size: 1rem;
+}
+
+.rush-supported {
+    color: green;
+    font-weight: bold;
+}
+
+.rush-unsupported {
+    color: red;
+}
+
+/* Style cụ thể cho role-selection.html */
+.role-selection {
+    width: 1200px; /* Giới hạn chiều rộng */
+    max-width: 100%;
+    min-height: 100vh;
+    padding: 2rem 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+    margin: 0 auto;
+}
+
+.role-selection h1 {
+    margin-bottom: 2rem;
+    font-size: 2.5rem; /* Giảm kích thước tiêu đề */
+    color: #333;
+}
+
+.role-selection h2 {
+    margin-bottom: 2rem; /* Giảm margin */
+    font-size: 1.5rem; /* Giảm kích thước phụ đề */
+    color: #555;
+}
+
+.role-selection .role-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 2rem; /* Giảm khoảng cách giữa các nút */
+    flex-wrap: wrap;
+}
+
+.role-selection .role-buttons a {
+    text-decoration: none;
+}
+
+.role-selection .role-buttons button {
+    margin: 0;
+    min-width: 200px; /* Giảm độ rộng */
+    font-size: 1.2rem; /* Giảm kích thước chữ */
+}
+
+/* Media queries để tối ưu cho laptop */
+@media screen and (max-width: 1366px) {
+    .container {
+        width: 1000px; /* Giảm chiều rộng trên màn hình nhỏ hơn */
+    }
+    .role-selection {
+        width: 1000px;
+    }
+    .role-selection h1 {
+        font-size: 2rem;
+    }
+    .role-selection h2 {
+        font-size: 1.2rem;
+    }
+    .role-selection .role-buttons button {
+        min-width: 180px;
+        font-size: 1rem;
+    }
+    #product-grid {
+        grid-template-columns: repeat(3, 1fr); /* Giảm xuống 3 cột */
+        max-height: 450px; /* Giảm chiều cao */
+        gap: 1rem;
+    }
+    .product-item {
+        min-height: 160px;
+    }
+}
+
+@media screen and (max-width: 1024px) {
+    .container {
+        width: 800px; /* Giảm thêm trên màn hình nhỏ */
+    }
+    .role-selection {
+        width: 800px;
+    }
+    .role-selection h1 {
+        font-size: 1.8rem;
+    }
+    .role-selection h2 {
+        font-size: 1rem;
+    }
+    .role-selection .role-buttons button {
+        min-width: 150px;
+        font-size: 0.9rem;
+    }
+    #product-grid {
+        grid-template-columns: repeat(2, 1fr); /* Giảm xuống 2 cột */
+        max-height: 400px;
+        gap: 0.8rem;
+    }
+    .product-item {
+        padding: 1rem;
+        min-height: 140px;
+    }
+    .product-item div {
+        font-size: 0.9rem;
+    }
+    .product-item button {
+        font-size: 0.9rem;
+    }
+}

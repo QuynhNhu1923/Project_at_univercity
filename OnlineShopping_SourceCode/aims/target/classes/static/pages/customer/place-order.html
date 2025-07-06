@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AIMS - Place Order</title>
+    <style>
+      body {
+        font-family: "Arial", sans-serif;
+        background: linear-gradient(135deg, #f0f2f5 0%, #e0e7ff 100%);
+        margin: 0;
+        padding: 20px;
+        color: #333;
+        min-height: 100vh;
+      }
+      .container {
+        max-width: 900px;
+        margin: 0 auto;
+        background: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+      }
+      .header {
+        background: linear-gradient(90deg, #2c3e50, #3498db);
+        color: white;
+        padding: 20px 30px;
+        text-align: center;
+      }
+      .header h1 {
+        margin: 0;
+        font-size: 2rem;
+        font-weight: 600;
+      }
+      .content {
+        padding: 30px;
+      }
+      .section {
+        margin-bottom: 30px;
+        padding: 20px;
+        border: 1px solid #e0e7ff;
+        border-radius: 8px;
+        background: #fafbff;
+      }
+      .section h2 {
+        color: #2c3e50;
+        margin-top: 0;
+        margin-bottom: 20px;
+        font-size: 1.5rem;
+        border-bottom: 2px solid #3498db;
+        padding-bottom: 10px;
+      }
+      .form-group {
+        margin-bottom: 20px;
+      }
+      .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: #2c3e50;
+      }
+      .form-group input,
+      .form-group select,
+      .form-group textarea {
+        width: 100%;
+        padding: 12px;
+        border: 2px solid #ddd;
+        border-radius: 6px;
+        font-size: 14px;
+        transition: border-color 0.3s;
+        box-sizing: border-box;
+      }
+      .form-group input:focus,
+      .form-group select:focus,
+      .form-group textarea:focus {
+        border-color: #3498db;
+        outline: none;
+      }
+      .checkbox-group {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 15px;
+      }
+      .checkbox-group input[type="checkbox"] {
+        width: auto;
+        margin: 0;
+      }
+      .rush-delivery-info {
+        background: #fff3cd;
+        border: 1px solid #ffc107;
+        border-radius: 6px;
+        padding: 15px;
+        margin-top: 15px;
+        display: none;
+      }
+      .rush-delivery-info.active {
+        display: block;
+      }
+      .cart-summary {
+        background: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 6px;
+        padding: 20px;
+      }
+      .cart-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 0;
+        border-bottom: 1px solid #e9ecef;
+      }
+      .cart-item:last-child {
+        border-bottom: none;
+      }
+      .price-summary {
+        background: #e8f5e8;
+        border: 1px solid #28a745;
+        border-radius: 6px;
+        padding: 20px;
+        margin-top: 20px;
+      }
+      .price-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+      }
+      .price-row.total {
+        font-weight: bold;
+        font-size: 1.2rem;
+        border-top: 2px solid #28a745;
+        padding-top: 10px;
+        margin-top: 15px;
+      }
+      .buttons {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+        margin-top: 30px;
+      }
+      .btn {
+        padding: 12px 30px;
+        border: none;
+        border-radius: 6px;
+        font-size: 16px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s;
+        text-decoration: none;
+        display: inline-block;
+        text-align: center;
+      }
+      .btn-primary {
+        background: linear-gradient(90deg, #2ecc71, #27ae60);
+        color: white;
+      }
+      .btn-primary:hover {
+        background: linear-gradient(90deg, #27ae60, #219653);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(39, 174, 96, 0.3);
+      }
+      .btn-secondary {
+        background: linear-gradient(90deg, #3498db, #2980b9);
+        color: white;
+      }
+      .btn-secondary:hover {
+        background: linear-gradient(90deg, #2980b9, #1e5c8a);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(41, 128, 185, 0.3);
+      }
+      .error-message {
+        background: #f8d7da;
+        color: #721c24;
+        padding: 15px;
+        border: 1px solid #f5c6cb;
+        border-radius: 6px;
+        margin-bottom: 20px;
+        display: none;
+      }
+      .success-message {
+        background: #d1edff;
+        color: #0c5460;
+        padding: 15px;
+        border: 1px solid #bee5eb;
+        border-radius: 6px;
+        margin-bottom: 20px;
+        display: none;
+      }
+      @media (max-width: 768px) {
+        .container {
+          margin: 10px;
+        }
+        .content {
+          padding: 20px;
+        }
+        .buttons {
+          flex-direction: column;
+        }
+        .btn {
+          width: 100%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>Place Your Order</h1>
+      </div>
+
+      <div class="content">
+        <div id="error-message" class="error-message"></div>
+        <div id="success-message" class="success-message"></div>
+
+        <!-- Cart Summary -->
+        <div class="section">
+          <h2>Order Summary</h2>
+          <div id="cart-summary" class="cart-summary">
+            <div id="cart-items">
+              <!-- Cart items will be loaded here -->
+            </div>
+            <div class="price-summary">
+              <div class="price-row">
+                <span>Subtotal (Excluding VAT):</span>
+                <span id="subtotal">0.00 VND</span>
+              </div>
+              <div class="price-row">
+                <span>VAT (10%):</span>
+                <span id="vat">0.00 VND</span>
+              </div>
+              <div class="price-row">
+                <span>Delivery Fee:</span>
+                <span id="delivery-fee">0.00 VND</span>
+              </div>
+              <div class="price-row">
+                <span>Rush Delivery Fee:</span>
+                <span id="rush-fee">0.00 VND</span>
+              </div>
+              <div class="price-row total">
+                <span>Total Amount:</span>
+                <span id="total-amount">0.00 VND</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Delivery Information -->
+        <div class="section">
+          <h2>Delivery Information</h2>
+          <form id="order-form">
+            <div class="form-group">
+              <label for="customer-name">Full Name *</label>
+              <input
+                type="text"
+                id="customer-name"
+                name="customerName"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="customer-email">Email *</label>
+              <input type="email" id="customer-email" name="email" required />
+            </div>
+
+            <div class="form-group">
+              <label for="customer-phone">Phone Number *</label>
+              <input type="tel" id="customer-phone" name="phone" required />
+            </div>
+
+            <div class="form-group">
+              <label for="province-city">Province/City *</label>
+              <select id="province-city" name="provinceCity" required>
+                <option value="">Select Province/City</option>
+                <option value="Hanoi">Hanoi</option>
+                <option value="Ho Chi Minh City">Ho Chi Minh City</option>
+                <option value="Da Nang">Da Nang</option>
+                <option value="Can Tho">Can Tho</option>
+                <option value="Hai Phong">Hai Phong</option>
+                <option value="Other">Other Province</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="delivery-address">Delivery Address *</label>
+              <textarea
+                id="delivery-address"
+                name="deliveryAddress"
+                rows="3"
+                required
+              ></textarea>
+            </div>
+
+            <!-- Rush Delivery Option -->
+            <div class="checkbox-group">
+              <input type="checkbox" id="rush-delivery" name="rushDelivery" />
+              <label for="rush-delivery"
+                >Rush Delivery (2 hours) - Available in Hanoi inner districts
+                only</label
+              >
+            </div>
+
+            <div id="rush-delivery-info" class="rush-delivery-info">
+              <h3>Rush Delivery Details</h3>
+              <div class="form-group">
+                <label for="delivery-time">Preferred Delivery Time *</label>
+                <input
+                  type="datetime-local"
+                  id="delivery-time"
+                  name="deliveryTime"
+                />
+              </div>
+              <div class="form-group">
+                <label for="delivery-instructions">Delivery Instructions</label>
+                <textarea
+                  id="delivery-instructions"
+                  name="deliveryInstructions"
+                  rows="2"
+                  placeholder="Special instructions for rush delivery..."
+                ></textarea>
+              </div>
+              <div class="rush-delivery-warning">
+                <p>
+                  <strong>Note:</strong> Rush delivery is only available for
+                  eligible products and addresses within Hanoi inner districts.
+                  Additional fee of 10,000 VND per item applies.
+                </p>
+              </div>
+            </div>
+          </form>
+        </div>
+
+        <!-- Payment Method -->
+        <div class="section">
+          <h2>Payment Method</h2>
+          <div class="form-group">
+            <label>Payment Options</label>
+            <div class="checkbox-group">
+              <input
+                type="radio"
+                id="payment-vnpay"
+                name="paymentMethod"
+                value="vnpay"
+                checked
+              />
+              <label for="payment-vnpay">VNPay (Credit Card)</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="buttons">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            onclick="goBackToCart()"
+          >
+            Back to Cart
+          </button>
+          <button
+            type="button"
+            class="btn btn-primary"
+            onclick="processOrder()"
+          >
+            Place Order
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Global variables
+      let cart = [];
+      let sessionId =
+        localStorage.getItem("sessionId") ||
+        "guest_" + Math.random().toString(36).substr(2, 9);
+      let deliveryFee = 0;
+      let rushDeliveryFee = 0;
+      let isRushEligible = false;
+
+      // Initialize page
+      document.addEventListener("DOMContentLoaded", function () {
+        loadCartData();
+        setupEventListeners();
+        calculateDeliveryFee();
+      });
+
+      function setupEventListeners() {
+        // Rush delivery checkbox
+        document
+          .getElementById("rush-delivery")
+          .addEventListener("change", function () {
+            const rushInfo = document.getElementById("rush-delivery-info");
+            const isChecked = this.checked;
+
+            if (isChecked) {
+              const provinceCity =
+                document.getElementById("province-city").value;
+              if (provinceCity !== "Hanoi") {
+                alert(
+                  "Rush delivery is only available in Hanoi. Please select Hanoi as your province/city."
+                );
+                this.checked = false;
+                return;
+              }
+              rushInfo.classList.add("active");
+            } else {
+              rushInfo.classList.remove("active");
+            }
+
+            calculateDeliveryFee();
+          });
+
+        // Province/City change
+        document
+          .getElementById("province-city")
+          .addEventListener("change", function () {
+            const rushCheckbox = document.getElementById("rush-delivery");
+            if (this.value !== "Hanoi" && rushCheckbox.checked) {
+              rushCheckbox.checked = false;
+              document
+                .getElementById("rush-delivery-info")
+                .classList.remove("active");
+              alert(
+                "Rush delivery is only available in Hanoi. Rush delivery has been disabled."
+              );
+            }
+            calculateDeliveryFee();
+          });
+
+        // Address change
+        document
+          .getElementById("delivery-address")
+          .addEventListener("input", calculateDeliveryFee);
+      }
+
+      async function loadCartData() {
+        try {
+          const response = await fetch(`/api/carts/${sessionId}`);
+          if (!response.ok) {
+            throw new Error("Failed to load cart data");
+          }
+
+          const cartData = await response.json();
+          cart = cartData.items || [];
+
+          if (cart.length === 0) {
+            showError(
+              "Your cart is empty. Please add items before placing an order."
+            );
+            setTimeout(() => {
+              window.location.href = "customer-dashboard.html";
+            }, 3000);
+            return;
+          }
+
+          displayCartSummary();
+          calculateDeliveryFee();
+        } catch (error) {
+          console.error("Error loading cart:", error);
+          showError("Failed to load cart data. Please try again.");
+        }
+      }
+
+      function displayCartSummary() {
+        const cartItemsContainer = document.getElementById("cart-items");
+        cartItemsContainer.innerHTML = "";
+
+        let subtotal = 0;
+
+        cart.forEach((item) => {
+          const itemTotal = (item.price || 0) * (item.quantity || 0);
+          subtotal += itemTotal;
+
+          const cartItem = document.createElement("div");
+          cartItem.className = "cart-item";
+          cartItem.innerHTML = `
+                    <div>
+                        <strong>${item.title || "Unknown Product"}</strong><br>
+                        <small>Quantity: ${
+                          item.quantity || 0
+                        } × ${formatCurrency(item.price || 0)}</small>
+                        ${
+                          item.rushDelivery
+                            ? '<br><span style="color: #e67e22;">✓ Rush Delivery Available</span>'
+                            : ""
+                        }
+                    </div>
+                    <div><strong>${formatCurrency(itemTotal)}</strong></div>
+                `;
+          cartItemsContainer.appendChild(cartItem);
+        });
+
+        updatePriceSummary(subtotal);
+      }
+
+      function calculateDeliveryFee() {
+        const provinceCity = document.getElementById("province-city").value;
+        const isRushDelivery = document.getElementById("rush-delivery").checked;
+
+        if (!cart.length) return;
+
+        // Calculate heaviest item weight
+        const heaviestWeight = Math.max(
+          ...cart.map((item) => parseFloat(item.weight || 0.5))
+        );
+
+        // Base delivery fee calculation
+        if (provinceCity === "Hanoi" || provinceCity === "Ho Chi Minh City") {
+          deliveryFee = 22000; // First 3kg
+          if (heaviestWeight > 3) {
+            const additionalWeight = Math.ceil((heaviestWeight - 3) / 0.5);
+            deliveryFee += additionalWeight * 2500;
+          }
+        } else {
+          deliveryFee = 30000; // First 0.5kg
+          if (heaviestWeight > 0.5) {
+            const additionalWeight = Math.ceil((heaviestWeight - 0.5) / 0.5);
+            deliveryFee += additionalWeight * 2500;
+          }
+        }
+
+        // Calculate rush delivery fee
+        rushDeliveryFee = 0;
+        if (isRushDelivery && provinceCity === "Hanoi") {
+          const eligibleItems = cart.filter((item) => item.rushDelivery);
+          rushDeliveryFee = eligibleItems.length * 10000;
+        }
+
+        // Free shipping for orders over 100,000 VND (excluding rush items)
+        const subtotal = cart.reduce(
+          (sum, item) => sum + item.price * item.quantity,
+          0
+        );
+        if (subtotal > 100000) {
+          deliveryFee = Math.max(0, deliveryFee - 25000);
+        }
+
+        updatePriceSummary();
+      }
+
+      function updatePriceSummary(subtotalOverride = null) {
+        const subtotal =
+          subtotalOverride !== null
+            ? subtotalOverride
+            : cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+        const vat = subtotal * 0.1;
+        const total = subtotal + vat + deliveryFee + rushDeliveryFee;
+
+        document.getElementById("subtotal").textContent =
+          formatCurrency(subtotal);
+        document.getElementById("vat").textContent = formatCurrency(vat);
+        document.getElementById("delivery-fee").textContent =
+          formatCurrency(deliveryFee);
+        document.getElementById("rush-fee").textContent =
+          formatCurrency(rushDeliveryFee);
+        document.getElementById("total-amount").textContent =
+          formatCurrency(total);
+      }
+
+      async function processOrder() {
+        try {
+          // Validate form
+          const form = document.getElementById("order-form");
+          if (!form.checkValidity()) {
+            form.reportValidity();
+            return;
+          }
+
+          // Validate rush delivery requirements
+          const isRushDelivery =
+            document.getElementById("rush-delivery").checked;
+          if (isRushDelivery) {
+            const deliveryTime = document.getElementById("delivery-time").value;
+            if (!deliveryTime) {
+              showError("Please select a delivery time for rush delivery.");
+              return;
+            }
+
+            const selectedTime = new Date(deliveryTime);
+            const now = new Date();
+            const minTime = new Date(now.getTime() + 2 * 60 * 60 * 1000); // 2 hours from now
+
+            if (selectedTime < minTime) {
+              showError(
+                "Rush delivery time must be at least 2 hours from now."
+              );
+              return;
+            }
+          }
+
+          // Prepare order data
+          const orderData = {
+            customerName: document.getElementById("customer-name").value,
+            email: document.getElementById("customer-email").value,
+            phone: document.getElementById("customer-phone").value,
+            provinceCity: document.getElementById("province-city").value,
+            deliveryAddress: document.getElementById("delivery-address").value,
+            deliveryMethod: isRushDelivery ? "rush" : "standard",
+            deliveryFee: deliveryFee + rushDeliveryFee,
+            totalAmount: parseFloat(
+              document
+                .getElementById("total-amount")
+                .textContent.replace(/[^0-9.-]+/g, "")
+            ),
+          };
+
+          // Add rush delivery details if applicable
+          if (isRushDelivery) {
+            orderData.rushDeliveryDetails = {
+              deliveryTime: document.getElementById("delivery-time").value,
+              deliveryInstructions: document.getElementById(
+                "delivery-instructions"
+              ).value,
+            };
+          }
+
+          // Create order
+          const response = await fetch(
+            `/api/orders/from-cart?sessionId=${sessionId}`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(orderData),
+            }
+          );
+
+          if (!response.ok) {
+            throw new Error("Failed to create order");
+          }
+
+          const result = await response.json();
+
+          if (result.success) {
+            // Redirect to VNPay for payment
+            window.location.href = result.paymentUrl;
+          } else {
+            throw new Error(result.error || "Unknown error occurred");
+          }
+        } catch (error) {
+          console.error("Error processing order:", error);
+          showError("Failed to process order: " + error.message);
+        }
+      }
+
+      function goBackToCart() {
+        window.location.href = "/pages/customer/cart.html";
+      }
+
+      function showError(message) {
+        const errorDiv = document.getElementById("error-message");
+        errorDiv.textContent = message;
+        errorDiv.style.display = "block";
+        document.getElementById("success-message").style.display = "none";
+
+        // Scroll to top to show error
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+
+      function showSuccess(message) {
+        const successDiv = document.getElementById("success-message");
+        successDiv.textContent = message;
+        successDiv.style.display = "block";
+        document.getElementById("error-message").style.display = "none";
+
+        // Scroll to top to show success
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+
+      function formatCurrency(amount) {
+        return (
+          new Intl.NumberFormat("en-US", {
+            style: "decimal",
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          }).format(amount || 0) + " VND"
+        );
+      }
+    </script>
+  </body>
+</html>

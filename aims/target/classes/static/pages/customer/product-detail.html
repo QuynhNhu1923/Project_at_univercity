@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Details</title>
+    <style>
+        body {
+            font-family: 'Arial', 'Helvetica Neue', sans-serif;
+            background: linear-gradient(135deg, #f0f2f5 0%, #e0e7ff 100%);
+            margin: 0;
+            padding: 20px 10px;
+            color: #333;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+        .container {
+            max-width: 900px;
+            width: 100%;
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 25px;
+            font-size: 2rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            background: linear-gradient(90deg, #2c3e50, #3498db);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .detail-section {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #fafafa;
+            border-radius: 8px;
+            border-left: 4px solid #3498db;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .detail-section:hover {
+            transform: translateX(5px);
+            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.2);
+        }
+        .detail-section label {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-right: 15px;
+            min-width: 150px;
+            display: inline-block;
+        }
+        .detail-section span {
+            color: #666;
+            word-break: break-word;
+        }
+        .quantity-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #fafafa;
+            border-radius: 8px;
+            border-left: 4px solid #2ecc71;
+        }
+        .quantity-section label {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-right: 10px;
+        }
+        .quantity-input {
+            width: 80px;
+            padding: 8px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            text-align: center;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        .quantity-input:focus {
+            border-color: #2ecc71;
+            outline: none;
+        }
+        .button-group {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        button {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: transform 0.3s, background-color 0.3s, box-shadow 0.3s;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .add-to-cart-btn {
+            background: linear-gradient(90deg, #2ecc71, #27ae60);
+            color: white;
+        }
+        .add-to-cart-btn:hover {
+            transform: translateY(-2px);
+            background: linear-gradient(90deg, #27ae60, #219653);
+            box-shadow: 0 6px 12px rgba(39, 174, 96, 0.3);
+        }
+        .back-btn {
+            background: linear-gradient(90deg, #3498db, #2980b9);
+            color: white;
+        }
+        .back-btn:hover {
+            transform: translateY(-2px);
+            background: linear-gradient(90deg, #2980b9, #1e5c8a);
+            box-shadow: 0 6px 12px rgba(41, 128, 185, 0.3);
+        }
+        @media (max-width: 600px) {
+            .container {
+                padding: 15px;
+            }
+            h1 {
+                font-size: 1.5rem;
+            }
+            .detail-section label {
+                min-width: 100px;
+            }
+            .quantity-section {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .quantity-input {
+                width: 100%;
+                margin-top: 5px;
+            }
+            .button-group button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+gff<body>
+<div class="container">
+    <h1>Customer Product Details</h1>
+    <div id="product-details" class="detail-section"></div>
+    <div class="quantity-section">
+        <label>Quantity:</label>
+        <input type="number" id="product-quantity" class="quantity-input" min="1" value="1">
+    </div>
+    <div class="button-group">
+        <button id="add-to-cart-btn" class="add-to-cart-btn" onclick="addToCartFromDetails()">Add to Cart</button>
+        <button class="back-btn" onclick="navigateTo('customer-dashboard.html')">Back to Dashboard</button>
+    </div>
+</div>
+
+<script src="/js/navigation.js"></script>
+<script src="/js/main.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const product = JSON.parse(sessionStorage.getItem('selectedProduct'));
+        const detailsDiv = document.getElementById('product-details');
+        if (!product) {
+            detailsDiv.innerHTML = '<p style="color: #e74c3c;">No product details available.</p>';
+            return;
+        }
+
+        // Hiển thị các trường chung từ Product.java
+        detailsDiv.innerHTML = `
+                <div><label>Barcode:</label><span>${product.barcode || 'N/A'}</span></div>
+                <div><label>Title:</label><span>${product.title || 'N/A'}</span></div>
+                <div><label>Category:</label><span>${product.category || 'N/A'}</span></div>
+                <div><label>Value:</label><span>${formatCurrency(product.value) || 'N/A'}</span></div>
+                <div><label>Price (excl. VAT):</label><span>${formatCurrency(product.price) || 'N/A'}</span></div>
+                <div><label>Stock:</label><span>${product.quantity || 'N/A'}</span></div>
+                <div><label>Warehouse Entry Date:</label><span>${product.warehouseEntryDate ? new Date(product.warehouseEntryDate).toLocaleDateString() : 'N/A'}</span></div>
+                <div><label>Dimensions:</label><span>${product.dimensions || 'N/A'}</span></div>
+                <div><label>Weight:</label><span>${product.weight || 'N/A'} kg</span></div>
+                <div><label>Description:</label><span>${product.description || 'N/A'}</span></div>
+                <div><label>Condition:</label><span>${product.condition || 'N/A'}</span></div>
+                <div><label>Created At:</label><span>${product.createdAt ? new Date(product.createdAt).toLocaleDateString() : 'N/A'}</span></div>
+                <div><label>Updated At:</label><span>${product.updatedAt ? new Date(product.updatedAt).toLocaleDateString() : 'N/A'}</span></div>
+                <div><label>Rush Delivery:</label><span>${product.rushDelivery ? 'Yes' : 'No'}</span></div>
+            `;
+
+        // Hiển thị thông tin theo category
+        switch (product.category.toLowerCase()) {
+            case 'cd':
+                detailsDiv.innerHTML += `
+                        <div><label>Artists:</label><span>${product.artists || 'N/A'}</span></div>
+                        <div><label>Record Label:</label><span>${product.recordLabel || 'N/A'}</span></div>
+                        <div><label>Tracklist:</label><span>${product.tracklist || 'N/A'}</span></div>
+                        <div><label>Genre:</label><span>${product.genre || 'N/A'}</span></div>
+                        <div><label>Release Date:</label><span>${product.releaseDate ? new Date(product.releaseDate).toLocaleDateString() : 'N/A'}</span></div>
+                    `;
+                break;
+            case 'book':
+                detailsDiv.innerHTML += `
+                        <div><label>Authors:</label><span>${product.authors || 'N/A'}</span></div>
+                        <div><label>Cover Type:</label><span>${product.coverType || 'N/A'}</span></div>
+                        <div><label>Publisher:</label><span>${product.publisher || 'N/A'}</span></div>
+                        <div><label>Publication Date:</label><span>${product.publicationDate ? new Date(product.publicationDate).toLocaleDateString() : 'N/A'}</span></div>
+                        <div><label>Number of Pages:</label><span>${product.numPages || 'N/A'}</span></div>
+                        <div><label>Language:</label><span>${product.language || 'N/A'}</span></div>
+                        <div><label>Genre:</label><span>${product.genre || 'N/A'}</span></div>
+                    `;
+                break;
+            case 'dvd':
+                detailsDiv.innerHTML += `
+                        <div><label>Disc Type:</label><span>${product.discType || 'N/A'}</span></div>
+                        <div><label>Director:</label><span>${product.director || 'N/A'}</span></div>
+                        <div><label>Runtime:</label><span>${product.runtime || 'N/A'} minutes</span></div>
+                        <div><label>Studio:</label><span>${product.studio || 'N/A'}</span></div>
+                        <div><label>Language:</label><span>${product.language || 'N/A'}</span></div>
+                        <div><label>Subtitles:</label><span>${product.subtitles || 'N/A'}</span></div>
+                        <div><label>Release Date:</label><span>${product.releaseDate ? new Date(product.releaseDate).toLocaleDateString() : 'N/A'}</span></div>
+                        <div><label>Genre:</label><span>${product.genre || 'N/A'}</span></div>
+                    `;
+                break;
+            case 'lp':
+                detailsDiv.innerHTML += `
+                        <div><label>Artists:</label><span>${product.artists || 'N/A'}</span></div>
+                        <div><label>Record Label:</label><span>${product.recordLabel || 'N/A'}</span></div>
+                        <div><label>Tracklist:</label><span>${product.tracklist || 'N/A'}</span></div>
+                        <div><label>Genre:</label><span>${product.genre || 'N/A'}</span></div>
+                        <div><label>Release Date:</label><span>${product.releaseDate ? new Date(product.releaseDate).toLocaleDateString() : 'N/A'}</span></div>
+                    `;
+                break;
+            default:
+                detailsDiv.innerHTML += '<p style="color: #666;">No specific category details available.</p>';
+        }
+
+        // Cập nhật max của input quantity
+        const quantityInput = document.getElementById('product-quantity');
+        if (quantityInput) {
+            quantityInput.max = product.quantity || 0;
+        }
+    });
+</script>
+</body>
+</html>

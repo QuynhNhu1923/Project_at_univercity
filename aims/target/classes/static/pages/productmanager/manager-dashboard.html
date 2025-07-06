@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AIMS - Product Manager Dashboard</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Poppins', 'Arial', sans-serif;
+      background: linear-gradient(135deg, #4a90e2 0%, #8e44ad 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: #333;
+    }
+    .container {
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      padding: 30px;
+      width: 100%;
+      max-width: 600px;
+      text-align: center;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      animation: fadeIn 0.5s ease-in-out;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    h2 {
+      color: #4a90e2;
+      font-size: 2rem;
+      font-weight: 600;
+      margin-bottom: 25px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+    }
+    .section {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .button-group {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 15px;
+    }
+    button {
+      padding: 12px 25px;
+      background: linear-gradient(90deg, #4a90e2, #8e44ad);
+      border: none;
+      border-radius: 8px;
+      color: white;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: transform 0.3s, background 0.3s, box-shadow 0.3s;
+      width: 100%;
+      max-width: 200px;
+    }
+    button:hover {
+      transform: translateY(-2px);
+      background: linear-gradient(90deg, #357abd, #703688);
+      box-shadow: 0 5px 15px rgba(74, 144, 226, 0.4);
+    }
+    .product-manager-grid {
+      margin-top: 20px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 15px;
+      padding: 20px;
+      background: #fafafa;
+      border-radius: 8px;
+      border-left: 4px solid #4a90e2;
+    }
+    @media (max-width: 480px) {
+      .container {
+        padding: 20px;
+        margin: 10px;
+      }
+      h2 {
+        font-size: 1.5rem;
+      }
+      button {
+        padding: 10px;
+        max-width: 100%;
+      }
+      .product-manager-grid {
+        padding: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div id="productmanager-section" class="section">
+    <h2>Product Manager Dashboard</h2>
+    <div class="button-group">
+      <button onclick="navigateTo('/pages/productmanager/product-management.html')">Manage Products</button>
+      <button onclick="navigateTo('/pages/productmanager/pending-orders.html')">View Orders</button>
+      <button onclick="navigateTo('/pages/productmanager/manager-login.html')">Logout</button>
+      <button onclick="navigateTo('/pages/role-selection.html')">Back to Role Selection</button>
+    </div>
+    <div id="product-manager-grid" class="product-manager-grid"></div>
+  </div>
+</div>
+<script src="/js/main.js"></script>
+<script src="/js/navigation.js"></script>
+</body>
+</html>
