@@ -1,8 +1,9 @@
 package com.aims.controller;
 
-import com.aims.config.JwtAuthenticationFilter;
 import com.aims.model.User;
 import com.aims.repository.UserRepository;
+import com.aims.util.JwtUtil;
+import jakarta.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,10 +25,10 @@ public class AuthController {
     private UserRepository userRepository;
 
     @Autowired
-    private JwtAuthenticationFilter jwtUtil;
+    private UserDetailsService userDetailsService;
 
     @Autowired
-    private UserDetailsService userDetailsService;
+    private JwtUtil jwtUtil;
 
     @PostMapping("/login")
     public ResponseEntity<Map<String, Object>> login(@RequestBody Map<String, String> loginRequest) {
@@ -43,7 +44,7 @@ public class AuthController {
             ));
         }
 
-        logger.info("Login attempt for email: {}", email);
+        logger.info("Login attempt for email: {}, requested role: {}", email, requestedRole);
         Optional<User> userOpt = userRepository.findByEmail(email);
         if (userOpt.isEmpty() || !password.equals(userOpt.get().getPassword())) {
             logger.warn("Invalid credentials for email: {}", email);
@@ -67,23 +68,50 @@ public class AuthController {
                 .filter(r -> r.equals("PRODUCT_MANAGER") || r.equals("ADMIN"))
                 .findFirst()
                 .orElse(null);
+        logger.info("User role from DB: {}, requested role: {}", role, requestedRole);
 
-        if (role == null || !role.equalsIgnoreCase(requestedRole)) {
-            logger.warn("Invalid role for email: {}, requested: {}", email, requestedRole);
+        // Chuẩn hóa role: loại bỏ dấu gạch dưới và chuyển thành chữ thường
+        String normalizedRequestedRole = requestedRole.replaceAll("_", "").toLowerCase();
+        String normalizedRole = role != null ? role.replaceAll("_", "").toLowerCase() : null;
+
+        if (role == null || !normalizedRequestedRole.equals(normalizedRole)) {
+            logger.warn("Invalid role for email: {}, requested: {}, db role: {}", email, requestedRole, role);
             return ResponseEntity.status(403).body(Map.of(
                     "success", false,
                     "message", "Only Product Manager or Admin can login with specified role"
             ));
         }
 
+        // Đảm bảo UserDetailsService tải đúng role
         UserDetails userDetails = userDetailsService.loadUserByUsername(email);
-        String token = jwtUtil.generateToken(userDetails);
+        if (userDetails == null) {
+            logger.error("UserDetails not found for email: {}", email);
+            return ResponseEntity.status(500).body(Map.of(
+                    "success", false,
+                    "message", "Internal server error"
+            ));
+        }
 
-        logger.info("Login successful for email: {}", email);
+        String token = jwtUtil.generateToken(userDetails);
+        logger.info("Login successful for email: {}, generated token: {}", email, token);
         Map<String, Object> response = new HashMap<>();
         response.put("success", true);
         response.put("token", token);
         response.put("role", role);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<Map<String, Object>> logout(HttpSession session) {
+        session.invalidate();
+        return ResponseEntity.ok(Map.of("success", true, "message", "Logged out successfully"));
+    }
+    @PostMapping("/anonymous")
+    public ResponseEntity<Map<String, Object>> anonymousLogin() {
+        Map<String, Object> response = new HashMap<>();
+        response.put("success", true);
+        response.put("token", "anonymous-token"); // Token giả hoặc để trống
+        response.put("role", "ANONYMOUS");
         return ResponseEntity.ok(response);
     }
 }

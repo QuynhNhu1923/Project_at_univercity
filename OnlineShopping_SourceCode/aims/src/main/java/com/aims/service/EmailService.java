@@ -19,17 +19,18 @@ public class EmailService {
     @Autowired
     private JavaMailSender mailSender;
 
-    public void sendOrderConfirmation(Order order) throws MessagingException {
+    public void sendOrderConfirmation(Order order) {
         if (order == null || order.getEmail() == null || order.getEmail().isEmpty()) {
             logger.error("Invalid order or email for confirmation");
-            throw new IllegalArgumentException("Invalid order or email");
+            return; // Không ném exception
         }
 
         logger.info("Preparing order confirmation email for order: {}", order.getOrderId());
-        MimeMessage message = mailSender.createMimeMessage();
-        MimeMessageHelper helper = new MimeMessageHelper(message, true);
-
+        
         try {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true);
+
             helper.setTo(order.getEmail());
             helper.setSubject("AIMS - Order Confirmation #" + order.getOrderId());
 
@@ -65,9 +66,12 @@ public class EmailService {
             helper.setText(emailContent.toString(), true);
             mailSender.send(message);
             logger.info("Order confirmation email sent to: {}", order.getEmail());
-        } catch (MessagingException e) {
+            
+        } catch (Exception e) {
+            // Log lỗi nhưng KHÔNG ném exception để không block việc tạo order
             logger.error("Failed to send confirmation email for order {}: {}", order.getOrderId(), e.getMessage());
-            throw e;
+            logger.info("Order created successfully despite email failure");
+            // KHÔNG throw exception ở đây
         }
     }
 

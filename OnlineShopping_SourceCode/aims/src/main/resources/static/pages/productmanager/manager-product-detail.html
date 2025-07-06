@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AIMS - Edit Product</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+        input[readonly] {
+            background-color: #f8f9fa;
+            color: #6c757d;
+        }
+        input.error, select.error, textarea.error {
+            border-color: #e74c3c;
+            background-color: #fdf2f2;
+        }
+        .error-message {
+            color: #e74c3c;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+        .hidden {
+            display: none;
+        }
+        .specific-details {
+            border: 1px solid #e0e0e0;
+            padding: 20px;
+            margin-top: 20px;
+            border-radius: 4px;
+            background-color: #fafafa;
+        }
+        .specific-details h3 {
+            margin-top: 0;
+            color: #333;
+        }
+        .button-group {
+            text-align: center;
+            margin-top: 30px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 0 10px;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .cancel-btn {
+            background-color: #6c757d;
+        }
+        .cancel-btn:hover {
+            background-color: #545b62;
+        }
+        .danger-btn {
+            background-color: #dc3545;
+        }
+        .danger-btn:hover {
+            background-color: #c82333;
+        }
+        .form-row {
+            display: flex;
+            gap: 20px;
+        }
+        .form-row .form-group {
+            flex: 1;
+        }
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .checkbox-group input[type="checkbox"] {
+            width: auto;
+        }
+        .price-limits {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 5px;
+            font-size: 12px;
+        }
+        .info-section {
+            background-color: #e3f2fd;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            border-left: 4px solid #2196f3;
+        }
+        .info-section h3 {
+            margin: 0 0 10px 0;
+            color: #1976d2;
+        }
+        .product-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 12px;
+            background: white;
+            border-radius: 4px;
+            border: 1px solid #e0e0e0;
+        }
+        .info-label {
+            font-weight: bold;
+            color: #666;
+        }
+        .info-value {
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Edit Product</h1>
+
+    <!-- Product Information Display -->
+    <div class="info-section">
+        <h3>Current Product Information</h3>
+        <div class="product-info" id="product-info">
+            <!-- Product info will be populated here -->
+        </div>
+    </div>
+
+    <form id="edit-form">
+        <!-- Common Product Information -->
+        <div class="form-row">
+            <div class="form-group">
+                <label for="edit-barcode">Barcode *</label>
+                <input type="text" id="edit-barcode" readonly>
+                <div id="edit-barcode-error" class="error-message hidden"></div>
+            </div>
+            <div class="form-group">
+                <label for="edit-category">Category *</label>
+                <select id="edit-category" disabled>
+                    <option value="Book">Book</option>
+                    <option value="CD">CD</option>
+                    <option value="LP">LP</option>
+                    <option value="DVD">DVD</option>
+                </select>
+                <div id="edit-category-error" class="error-message hidden"></div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="edit-title">Title *</label>
+            <input type="text" id="edit-title" required>
+            <div id="edit-title-error" class="error-message hidden"></div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="edit-value">Value (VND) *</label>
+                <input type="number" id="edit-value" step="0.01" min="0" required>
+                <div id="edit-value-error" class="error-message hidden"></div>
+            </div>
+            <div class="form-group">
+                <label for="edit-price">Price (VND) *</label>
+                <input type="number" id="edit-price" step="0.01" min="0" required>
+                <div id="edit-price-error" class="error-message hidden"></div>
+                <div class="price-limits">
+                    <small>Price must be between 30% and 150% of value</small>
+                    <div id="price-update-limits"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="edit-quantity">Quantity *</label>
+                <input type="number" id="edit-quantity" min="0" required>
+                <div id="edit-quantity-error" class="error-message hidden"></div>
+            </div>
+            <div class="form-group">
+                <label for="edit-weight">Weight (kg) *</label>
+                <input type="number" id="edit-weight" step="0.01" min="0" required>
+                <div id="edit-weight-error" class="error-message hidden"></div>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="edit-warehouse-entry-date">Warehouse Entry Date</label>
+                <input type="date" id="edit-warehouse-entry-date">
+                <div id="edit-warehouse-entry-date-error" class="error-message hidden"></div>
+            </div>
+            <div class="form-group">
+                <label for="edit-condition">Condition *</label>
+                <select id="edit-condition" required>
+                    <option value="new">New</option>
+                    <option value="used">Used</option>
+                    <option value="refurbished">Refurbished</option>
+                </select>
+                <div id="edit-condition-error" class="error-message hidden"></div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="edit-dimensions">Dimensions</label>
+            <input type="text" id="edit-dimensions" placeholder="e.g., 20x15x3 cm">
+            <div id="edit-dimensions-error" class="error-message hidden"></div>
+        </div>
+
+        <div class="form-group">
+            <label for="edit-description">Description</label>
+            <textarea id="edit-description" rows="3" placeholder="Product description"></textarea>
+            <div id="edit-description-error" class="error-message hidden"></div>
+        </div>
+
+        <div class="form-group">
+            <div class="checkbox-group">
+                <input type="checkbox" id="edit-rush-delivery">
+                <label for="edit-rush-delivery">Rush Delivery Supported</label>
+            </div>
+        </div>
+
+        <!-- Category-Specific Details -->
+        <div id="specific-details" class="specific-details hidden">
+            <!-- Book Details -->
+            <div id="book-details" class="hidden">
+                <h3>Book Details</h3>
+                <div class="form-group">
+                    <label for="edit-authors">Authors *</label>
+                    <input type="text" id="edit-authors" placeholder="e.g., Paulo Coelho">
+                    <div id="edit-authors-error" class="error-message hidden"></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="edit-cover-type">Cover Type *</label>
+                        <select id="edit-cover-type">
+                            <option value="paperback">Paperback</option>
+                            <option value="hardcover">Hardcover</option>
+                        </select>
+                        <div id="edit-cover-type-error" class="error-message hidden"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-num-pages">Number of Pages</label>
+                        <input type="number" id="edit-num-pages" min="1">
+                        <div id="edit-num-pages-error" class="error-message hidden"></div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="edit-publisher">Publisher *</label>
+                    <input type="text" id="edit-publisher">
+                    <div id="edit-publisher-error" class="error-message hidden"></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="edit-publication-date">Publication Date</label>
+                        <input type="date" id="edit-publication-date">
+                        <div id="edit-publication-date-error" class="error-message hidden"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-language">Language</label>
+                        <input type="text" id="edit-language" placeholder="e.g., English">
+                        <div id="edit-language-error" class="error-message hidden"></div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <input type="text" id="edit-genre" placeholder="e.g., Fiction, Non-fiction">
+                    <div id="edit-genre-error" class="error-message hidden"></div>
+                </div>
+            </div>
+
+            <!-- CD Details -->
+            <div id="cd-details" class="hidden">
+                <h3>CD Details</h3>
+                <div class="form-group">
+                    <label for="edit-artists">Artists *</label>
+                    <input type="text" id="edit-artists" placeholder="e.g., The Beatles">
+                    <div id="edit-artists-error" class="error-message hidden"></div>
+                </div>
+                <div class="form-group">
+                    <label for="edit-record-label">Record Label *</label>
+                    <input type="text" id="edit-record-label" placeholder="e.g., Sony Music">
+                    <div id="edit-record-label-error" class="error-message hidden"></div>
+                </div>
+                <div class="form-group">
+                    <label for="edit-tracklist">Tracklist *</label>
+                    <textarea id="edit-tracklist" rows="3" placeholder="List of tracks, one per line"></textarea>
+                    <div id="edit-tracklist-error" class="error-message hidden"></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="edit-genre-cd">Genre</label>
+                        <input type="text" id="edit-genre-cd" placeholder="e.g., Rock, Pop, Jazz">
+                        <div id="edit-genre-cd-error" class="error-message hidden"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-release-date-cd">Release Date</label>
+                        <input type="date" id="edit-release-date-cd">
+                        <div id="edit-release-date-cd-error" class="error-message hidden"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- LP Details -->
+            <div id="lp-details" class="hidden">
+                <h3>LP Details</h3>
+                <div class="form-group">
+                    <label for="edit-artists-lp">Artists *</label>
+                    <input type="text" id="edit-artists-lp" placeholder="e.g., Pink Floyd">
+                    <div id="edit-artists-lp-error" class="error-message hidden"></div>
+                </div>
+                <div class="form-group">
+                    <label for="edit-record-label-lp">Record Label *</label>
+                    <input type="text" id="edit-record-label-lp" placeholder="e.g., Columbia Records">
+                    <div id="edit-record-label-lp-error" class="error-message hidden"></div>
+                </div>
+                <div class="form-group">
+                    <label for="edit-tracklist-lp">Tracklist *</label>
+                    <textarea id="edit-tracklist-lp" rows="3" placeholder="List of tracks, one per line"></textarea>
+                    <div id="edit-tracklist-lp-error" class="error-message hidden"></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="edit-genre-lp">Genre</label>
+                        <input type="text" id="edit-genre-lp" placeholder="e.g., Progressive Rock, Classic Rock">
+                        <div id="edit-genre-lp-error" class="error-message hidden"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-release-date-lp">Release Date</label>
+                        <input type="date" id="edit-release-date-lp">
+                        <div id="edit-release-date-lp-error" class="error-message hidden"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DVD Details -->
+            <div id="dvd-details" class="hidden">
+                <h3>DVD Details</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="edit-disc-type">Disc Type *</label>
+                        <select id="edit-disc-type">
+                            <option value="DVD">DVD</option>
+                            <option value="Blu-ray">Blu-ray</option>
+                            <option value="HD-DVD">HD-DVD</option>
+                        </select>
+                        <div id="edit-disc-type-error" class="error-message hidden"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-runtime">Runtime (minutes) *</label>
+                        <input type="number" id="edit-runtime" min="1" placeholder="e.g., 120">
+                        <div id="edit-runtime-error" class="error-message hidden"></div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="edit-director">Director *</label>
+                    <input type="text" id="edit-director" placeholder="e.g., Steven Spielberg">
+                    <div id="edit-director-error" class="error-message hidden"></div>
+                </div>
+                <div class="form-group">
+                    <label for="edit-studio">Studio *</label>
+                    <input type="text" id="edit-studio" placeholder="e.g., Universal Studios">
+                    <div id="edit-studio-error" class="error-message hidden"></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="edit-language-dvd">Language *</label>
+                        <input type="text" id="edit-language-dvd" placeholder="e.g., English">
+                        <div id="edit-language-dvd-error" class="error-message hidden"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-subtitles">Subtitles</label>
+                        <input type="text" id="edit-subtitles" placeholder="e.g., English, Spanish, French">
+                        <div id="edit-subtitles-error" class="error-message hidden"></div>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="edit-release-date-dvd">Release Date</label>
+                        <input type="date" id="edit-release-date-dvd">
+                        <div id="edit-release-date-dvd-error" class="error-message hidden"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-genre-dvd">Genre</label>
+                        <input type="text" id="edit-genre-dvd" placeholder="e.g., Action, Drama, Comedy">
+                        <div id="edit-genre-dvd-error" class="error-message hidden"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="button-group">
+            <button type="submit" id="save-btn">Save Changes</button>
+            <button type="button" id="cancel-btn" class="cancel-btn">Cancel Changes</button>
+            <button type="button" id="delete-btn" class="danger-btn">Delete Product</button>
+            <button type="button" id="back-btn" class="cancel-btn">Back to List</button>
+        </div>
+    </form>
+</div>
+
+<script src="/js/product.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Load price update limits
+        loadPriceUpdateLimits();
+
+        // Add event listener for price field to update limits when changed
+        document.getElementById('edit-price').addEventListener('input', updatePriceLimitsDisplay);
+        document.getElementById('edit-value').addEventListener('input', updatePriceLimitsDisplay);
+
+        // Delete button functionality
+        document.getElementById('delete-btn').addEventListener('click', deleteCurrentProduct);
+    });
+
+    async function loadPriceUpdateLimits() {
+        const barcode = document.getElementById('edit-barcode').value;
+        if (!barcode) return;
+
+        try {
+            const response = await fetch(`/api/products/price-limits?barcode=${encodeURIComponent(barcode)}`, {
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
+                }
+            });
+
+            if (response.ok) {
+                const limits = await response.json();
+                updatePriceUpdateLimitsDisplay(limits);
+            }
+        } catch (error) {
+            console.error('Error loading price limits:', error);
+        }
+    }
+
+    function updatePriceUpdateLimitsDisplay(limits = null) {
+        const limitsDiv = document.getElementById('price-update-limits');
+        const valueField = document.getElementById('edit-value');
+        const priceField = document.getElementById('edit-price');
+
+        if (valueField.value && priceField.value) {
+            const value = parseFloat(valueField.value);
+            const price = parseFloat(priceField.value);
+            const minPrice = value * 0.3;
+            const maxPrice = value * 1.5;
+
+            let html = `<small>Valid range: ${minPrice.toFixed(2)} - ${maxPrice.toFixed(2)} VND</small>`;
+
+            if (limits) {
+                const remaining = limits.remainingPriceUpdates || 0;
+                const canUpdate = limits.canUpdatePrice !== false;
+
+                html += `<br><small style="color: ${canUpdate ? '#28a745' : '#dc3545'}">
+                        Price updates today: ${(2 - remaining)}/2 (${remaining} remaining)
+                    </small>`;
+            }
+
+            limitsDiv.innerHTML = html;
+        }
+    }
+
+    async function deleteCurrentProduct() {
+        const barcode = document.getElementById('edit-barcode').value;
+        if (!barcode) {
+            alert('No product selected');
+            return;
+        }
+
+        if (!confirm(`Are you sure you want to delete product ${barcode}? This action cannot be undone.`)) {
+            return;
+        }
+
+        try {
+            const response = await fetch(`/api/products/${barcode}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
+                }
+            });
+
+            const result = await response.json();
+
+            if (response.ok && result.success) {
+                alert('✓ Product deleted successfully');
+                window.location.href = '/pages/productmanager/product-management.html';
+            } else {
+                throw new Error(result.error || 'Failed to delete product');
+            }
+        } catch (error) {
+            console.error('Error deleting product:', error);
+            alert('✖ Error deleting product: ' + error.message);
+        }
+    }
+
+    function displayProductInfo(product) {
+        const productInfo = document.getElementById('product-info');
+        productInfo.innerHTML = `
+                <div class="info-item">
+                    <span class="info-label">Barcode:</span>
+                    <span class="info-value">${product.barcode || 'N/A'}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Category:</span>
+                    <span class="info-value">${product.category || 'N/A'}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Created:</span>
+                    <span class="info-value">${product.createdAt ? new Date(product.createdAt).toLocaleDateString() : 'N/A'}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Last Modified:</span>
+                    <span class="info-value">${product.updatedAt ? new Date(product.updatedAt).toLocaleDateString() : 'N/A'}</span>
+                </div>
+            `;
+    }
+
+    function navigateTo(url) {
+        window.location.href = url;
+    }
+
+    // Override the initialization function to include product info display
+    const originalInitializeProductDetailPage = window.initializeProductDetailPage;
+    if (typeof originalInitializeProductDetailPage === 'function') {
+        window.initializeProductDetailPage = function() {
+            const product = JSON.parse(sessionStorage.getItem('selectedProduct') || '{}');
+            if (product && Object.keys(product).length > 0) {
+                displayProductInfo(product);
+            }
+            originalInitializeProductDetailPage();
+            loadPriceUpdateLimits();
+        };
+    }
+</script>
+</body>
+</html>

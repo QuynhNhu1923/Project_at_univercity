@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add New Product</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .error { border: 2px solid #dc2626; }
+        .error-message { color: #dc2626; font-size: 0.875rem; margin-top: 0.25rem; }
+        .success-message { color: #16a34a; font-size: 0.875rem; margin-top: 0.25rem; }
+        .required { color: #dc2626; }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-gray-100 min-h-screen flex items-center justify-center p-4">
+<div class="w-full max-w-4xl bg-white rounded-xl shadow-xl p-8">
+    <h1 class="text-3xl font-bold text-blue-800 mb-8 text-center">Add New Product</h1>
+
+    <div id="success-message" class="hidden mb-6 p-4 bg-green-100 border border-green-400 text-green-700 rounded-lg"></div>
+    <div id="error-message" class="hidden mb-6 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg"></div>
+
+    <form id="add-product-form" class="space-y-6">
+        <!-- Common Product Fields -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="flex flex-col">
+                <label class="text-sm font-medium text-gray-700">Barcode <span class="required">*</span></label>
+                <input type="text" id="barcode" placeholder="Leave empty to auto-generate" class="mt-1 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition-colors">
+                <div id="barcode-error" class="error-message hidden"></div>
+            </div>
+
+            <div class="flex flex-col">
+                <label class="text-sm font-medium text-gray-700">Product Category <span class="required">*</span></label>
+                <select id="category" required onchange="showSpecificFields()" class="mt-1 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition-colors">
+                    <option value="">Select Category</option>
+                    <option value="Book">Book</option>
+                    <option value="CD">CD</option>
+                    <option value="LP">LP</option>
+                    <option value="DVD">DVD</option>
+                </select>
+                <div id="category-error" class="error-message hidden"></div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="flex flex-col">
+                <label class="text-sm font-medium text-gray-700">Product Title <span class="required">*</span></label>
+                <input type="text" id="title" required class="mt-1 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition-colors">
+                <div id="title-error" class="error-message hidden"></div>
+            </div>
+
+            <div class="flex flex-col">
+                <label class="text-sm font-medium text-gray-700">Description</label>
+                <textarea id="description" rows="3" class="mt-1 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition-colors"></textarea>
+                <div id="description-error" class="error-message hidden"></div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="flex flex-col">
+                <label class="text-sm font-medium text-gray-700">Value (VND) <span class="required">*</span></label>
+                <input type="number" id="value" step="0.01" min="0" required class="mt-1 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition-colors">
+                <div id="value-error" class="error-message hidden"></div>
+            </div>
+
+            <div class="flex flex-col">
+                <label class="text-sm font-medium text-gray-700">Price (VND) <span class="required">*</span></label>
+                <input type="number" id="price" step="0.01" min="0" required onblur="validatePriceRange()" class="mt-1 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition-colors">
+                <div id="price-error" class="error-message hidden"></div>
+                <div class="text-xs text-gray-500 mt-1">Price must be 30%-150% of value</div>
+            </div>
+
+            <div class="flex flex-col">
+                <label class="text-sm font-medium text-gray-700">Quantity <span class="required">*</span></label>
+                <input type="number" id="quantity" min="0" required class="mt-1 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition-colors">
+                <div id="quantity-error" class="error-message hidden"></div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="flex flex-col">
+                <label class="text-sm font-medium text-gray-700">Warehouse Entry Date <span class="required">*</span></label>
+                <input type="date" id="warehouseEntryDate" required class="mt-1 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition-colors">
+                <div id="warehouseEntryDate-error" class="error-message hidden"></div>
+            </div>
+
+            <div class="flex flex-col">
+                <label class="text-sm font-medium text-gray-700">Weight (kg) <span class="required">*</span></label>
+                <input type="number" id="weight" step="0.01" min="0" required class="mt-1 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition-colors">
+                <div id="weight-error" class="error-message hidden"></div>
+            </div>
+
+            <div class="flex flex-col">
+                <label class="text-sm font-medium text-gray-700">Condition <span class="required">*</span></label>
+                <select id="condition" required class="mt-1 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition-colors">
+                    <option value="">Select Condition</option>
+                    <option value="New">New</option>
+                    <option value="Used - Like New">Used - Like New</option>
+                    <option value="Used - Good">Used - Good</option>
+                    <option value="Used - Fair">Used - Fair</option>
+                    <option value="Refurbished">Refurbished</option>
+                </select>
+                <div id="condition-error" class="error-message hidden"></div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="flex flex-col">
+                <label class="text-sm font-medium text-gray-700">Dimensions (L x W x H cm)</label>
+                <input type="text" id="dimensions" placeholder="e.g., 20 x 15 x 2" class="mt-1 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition-colors">
+                <div id="dimensions-error" class="error-message hidden"></div>
+            </div>
+
+            <div class="flex items-center">
+                <input type="checkbox" id="rushDelivery" class="h-5 w-5 text-blue-600 focus:ring-blue-600 border-gray-300 rounded">
+                <label for="rushDelivery" class="ml-3 text-sm font-medium text-gray-700">Rush Delivery Available</label>
+            </div>
+        </div>
+
+        <!-- Category-specific fields -->
+        <div id="specific-fields" class="hidden">
+            <h3 class="text-xl font-semibold text-gray-800 mb-4">Category-Specific Information</h3>
+
+            <!-- Book fields -->
+            <div id="book-fields" class="hidden space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="flex flex-col">
+                        <label class="text-sm font-medium text-gray-700">Authors <span class="required">*</span></label>
+                        <input type="text" id="authors" class="mt-1 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition-colors">
+                    </div>
+                    <div class="flex flex-col">
+                        <label class="text-sm font-medium text-gray-700">Publisher <span class="required">*</span></label>
+                        <input type="text" id="publisher" class="mt-1 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition-colors">
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="flex flex-col">
+                        <label class="text-sm font-medium text-gray-700">Cover Type <span class="required">*</span></label>
+                        <select id="coverType" class="mt-1 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition-colors">
+                            <option value="">Select Cover Type</option>
+                            <option value="Paperback">Paperback</option>
+                            <option value="Hardcover">Hardcover</option>
+                        </select>
+                    </div>
+                    <div class="flex flex-col">
+                        <label class="text-sm font-medium text-gray-700">Publication Date</label>
+                        <input type="date" id="publicationDate" class="mt-1 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition-colors">
+                    </div>
+                    <div class="flex flex-col">
+                        <label class="text-sm font-medium text-gray-700">Number of Pages</label>
+                        <input type="number" id="numPages" min="0" class="mt-1 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition-colors">
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="flex flex-col">
+                        <label class="text-sm font-medium text-gray-700">Language</label>
+                        <input type="text" id="language" class="mt-1 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition-colors">
+                    </div>
+                    <div class="flex flex-col">
+                        <label class="text-sm font-medium text-gray-700">Genre</label>
+                        <input type="text" id="genre" class="mt-1 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition-colors">
+                    </div>
+                </div>
+            </div>
+
+            <!-- CD fields -->
+            <div id="cd-fields" class="hidden space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="flex flex-col">
+                        <label class="text-sm font-medium text-gray-700">Artists <span class="required">*</span></label>
+                        <input type="text" id="cd-artists" class="mt-1 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition-colors">
+                    </div>
+                    <div class="flex flex-col">
+                        <label class="text-sm font-medium text-gray-700">Record Label <span class="required">*</span></label>
+                        <input type="text" id="cd-recordLabel" class="mt-1 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition-colors">
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="flex flex-col">
+                        <label class="text-sm font-medium text-gray-700">Genre</label>
+                        <input type="text" id="cd-genre" class="mt-1 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition-colors">
+                    </div>
+                    <div class="flex flex-col">
+                        <label class="text-sm font-medium text-gray-700">Release Date</label>
+                        <input type="date" id="cd-releaseDate" class="mt-1 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition-colors">
+                    </div>
+                </div>
+                <div class="flex flex-col">
+                    <label class="text-sm font-medium text-gray-700">Tracklist <span class="required">*</span></label>
+                    <textarea id="cd-tracklist" rows="4" placeholder="Enter track list, one track per line" class="mt-1 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition-colors"></textarea>
+                </div>
+            </div>
+
+            <!-- LP fields -->
+            <div id="lp-fields" class="hidden space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="flex flex-col">
+                        <label class="text-sm font-medium text-gray-700">Artists <span class="required">*</span></label>
+                        <input type="text" id="lp-artists" class="mt-1 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition-colors">
+                    </div>
+                    <div class="flex flex-col">
+                        <label class="text-sm font-medium text-gray-700">Record Label <span class="required">*</span></label>
+                        <input type="text" id="lp-recordLabel" class="mt-1 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition-colors">
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="flex flex-col">
+                        <label class="text-sm font-medium text-gray-700">Genre</label>
+                        <input type="text" id="lp-genre" class="mt-1 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition-colors">
+                    </div>
+                    <div class="flex flex-col">
+                        <label class="text-sm font-medium text-gray-700">Release Date</label>
+                        <input type="date" id="lp-releaseDate" class="mt-1 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition-colors">
+                    </div>
+                </div>
+                <div class="flex flex-col">
+                    <label class="text-sm font-medium text-gray-700">Tracklist <span class="required">*</span></label>
+                    <textarea id="lp-tracklist" rows="4" placeholder="Enter track list, one track per line" class="mt-1 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition-colors"></textarea>
+                </div>
+            </div>
+
+            <!-- DVD fields -->
+            <div id="dvd-fields" class="hidden space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="flex flex-col">
+                        <label class="text-sm font-medium text-gray-700">Disc Type <span class="required">*</span></label>
+                        <select id="discType" class="mt-1 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition-colors">
+                            <option value="">Select Disc Type</option>
+                            <option value="Blu-ray">Blu-ray</option>
+                            <option value="HD-DVD">HD-DVD</option>
+                            <option value="DVD">Standard DVD</option>
+                        </select>
+                    </div>
+                    <div class="flex flex-col">
+                        <label class="text-sm font-medium text-gray-700">Director <span class="required">*</span></label>
+                        <input type="text" id="director" class="mt-1 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition-colors">
+                    </div>
+                    <div class="flex flex-col">
+                        <label class="text-sm font-medium text-gray-700">Runtime (minutes) <span class="required">*</span></label>
+                        <input type="number" id="runtime" min="0" class="mt-1 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition-colors">
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="flex flex-col">
+                        <label class="text-sm font-medium text-gray-700">Studio <span class="required">*</span></label>
+                        <input type="text" id="studio" class="mt-1 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition-colors">
+                    </div>
+                    <div class="flex flex-col">
+                        <label class="text-sm font-medium text-gray-700">Language <span class="required">*</span></label>
+                        <input type="text" id="dvd-language" class="mt-1 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition-colors">
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="flex flex-col">
+                        <label class="text-sm font-medium text-gray-700">Subtitles</label>
+                        <input type="text" id="subtitles" placeholder="e.g., English, Vietnamese" class="mt-1 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition-colors">
+                    </div>
+                    <div class="flex flex-col">
+                        <label class="text-sm font-medium text-gray-700">Release Date</label>
+                        <input type="date" id="dvd-releaseDate" class="mt-1 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition-colors">
+                    </div>
+                    <div class="flex flex-col">
+                        <label class="text-sm font-medium text-gray-700">Genre</label>
+                        <input type="text" id="dvd-genre" class="mt-1 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-blue-600 transition-colors">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action buttons -->
+        <div class="flex justify-end space-x-4 pt-6 border-t border-gray-200">
+            <button type="button" id="cancel-btn" onclick="goBack()" class="px-6 py-3 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 transition-colors">
+                Cancel
+            </button>
+            <button type="submit" id="submit-btn" class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors">
+                <span id="submit-text">Add Product</span>
+                <span id="submit-loading" class="hidden">Adding...</span>
+            </button>
+        </div>
+    </form>
+</div>
+
+<script>
+    let isSubmitting = false;
+
+    // Initialize form
+    document.addEventListener('DOMContentLoaded', function() {
+        // Set default warehouse entry date to today
+        document.getElementById('warehouseEntryDate').value = new Date().toISOString().split('T')[0];
+
+        // Add form submission handler
+        document.getElementById('add-product-form').addEventListener('submit', handleSubmit);
+    });
+
+    function showSpecificFields() {
+        const category = document.getElementById('category').value;
+        const specificFields = document.getElementById('specific-fields');
+
+        // Hide all specific field groups
+        document.getElementById('book-fields').classList.add('hidden');
+        document.getElementById('cd-fields').classList.add('hidden');
+        document.getElementById('lp-fields').classList.add('hidden');
+        document.getElementById('dvd-fields').classList.add('hidden');
+
+        if (category) {
+            specificFields.classList.remove('hidden');
+
+            switch(category) {
+                case 'Book':
+                    document.getElementById('book-fields').classList.remove('hidden');
+                    setRequiredFields(['authors', 'publisher', 'coverType']);
+                    break;
+                case 'CD':
+                    document.getElementById('cd-fields').classList.remove('hidden');
+                    setRequiredFields(['cd-artists', 'cd-recordLabel', 'cd-tracklist']);
+                    break;
+                case 'LP':
+                    document.getElementById('lp-fields').classList.remove('hidden');
+                    setRequiredFields(['lp-artists', 'lp-recordLabel', 'lp-tracklist']);
+                    break;
+                case 'DVD':
+                    document.getElementById('dvd-fields').classList.remove('hidden');
+                    setRequiredFields(['discType', 'director', 'runtime', 'studio', 'dvd-language']);
+                    break;
+            }
+        } else {
+            specificFields.classList.add('hidden');
+            clearRequiredFields();
+        }
+    }
+
+    function setRequiredFields(fieldIds) {
+        clearRequiredFields();
+        fieldIds.forEach(id => {
+            const field = document.getElementById(id);
+            if (field) {
+                field.setAttribute('required', 'required');
+            }
+        });
+    }
+
+    function clearRequiredFields() {
+        // Remove required attribute from all category-specific fields
+        const categoryFields = [
+            'authors', 'publisher', 'coverType', 'publicationDate', 'numPages', 'language', 'genre',
+            'cd-artists', 'cd-recordLabel', 'cd-tracklist', 'cd-genre', 'cd-releaseDate',
+            'lp-artists', 'lp-recordLabel', 'lp-tracklist', 'lp-genre', 'lp-releaseDate',
+            'discType', 'director', 'runtime', 'studio', 'dvd-language', 'subtitles', 'dvd-releaseDate', 'dvd-genre'
+        ];
+
+        categoryFields.forEach(id => {
+            const field = document.getElementById(id);
+            if (field) {
+                field.removeAttribute('required');
+            }
+        });
+    }
+
+    function validatePriceRange() {
+        const value = parseFloat(document.getElementById('value').value);
+        const price = parseFloat(document.getElementById('price').value);
+        const priceError = document.getElementById('price-error');
+
+        if (value && price) {
+            const minPrice = value * 0.3;
+            const maxPrice = value * 1.5;
+
+            if (price < minPrice || price > maxPrice) {
+                priceError.textContent = `Price must be between ${minPrice.toLocaleString()} and ${maxPrice.toLocaleString()} VND`;
+                priceError.classList.remove('hidden');
+                document.getElementById('price').classList.add('error');
+                return false;
+            } else {
+                priceError.classList.add('hidden');
+                document.getElementById('price').classList.remove('error');
+                return true;
+            }
+        }
+        return true;
+    }
+
+    function showMessage(type, message) {
+        const successEl = document.getElementById('success-message');
+        const errorEl = document.getElementById('error-message');
+
+        if (type === 'success') {
+            successEl.textContent = message;
+            successEl.classList.remove('hidden');
+            errorEl.classList.add('hidden');
+
+            // Auto-hide success message after 5 seconds
+            setTimeout(() => {
+                successEl.classList.add('hidden');
+            }, 5000);
+        } else {
+            errorEl.textContent = message;
+            errorEl.classList.remove('hidden');
+            successEl.classList.add('hidden');
+        }
+
+        // Scroll to top to show message
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function setSubmitting(submitting) {
+        isSubmitting = submitting;
+        const submitBtn = document.getElementById('submit-btn');
+        const submitText = document.getElementById('submit-text');
+        const submitLoading = document.getElementById('submit-loading');
+
+        if (submitting) {
+            submitBtn.disabled = true;
+            submitText.classList.add('hidden');
+            submitLoading.classList.remove('hidden');
+        } else {
+            submitBtn.disabled = false;
+            submitText.classList.remove('hidden');
+            submitLoading.classList.add('hidden');
+        }
+    }
+
+    async function handleSubmit(event) {
+        event.preventDefault();
+
+        if (isSubmitting) return;
+
+        if (!validateForm()) {
+            showMessage('error', 'Please fix the errors above and try again.');
+            return;
+        }
+
+        setSubmitting(true);
+
+        try {
+            const productData = collectFormData();
+
+            const response = await fetch('/api/products', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
+                },
+                body: JSON.stringify(productData)
+            });
+
+            const result = await response.json();
+
+            if (response.ok && result.success) {
+                showMessage('success', `Product added successfully! Barcode: ${result.barcode}`);
+                document.getElementById('add-product-form').reset();
+                document.getElementById('specific-fields').classList.add('hidden');
+
+                // Reset form to initial state
+                document.getElementById('warehouseEntryDate').value = new Date().toISOString().split('T')[0];
+            } else {
+                showMessage('error', result.error || 'Failed to add product. Please try again.');
+            }
+        } catch (error) {
+            console.error('Error adding product:', error);
+            showMessage('error', 'Network error. Please check your connection and try again.');
+        } finally {
+            setSubmitting(false);
+        }
+    }
+
+    function validateForm() {
+        let isValid = true;
+
+        // Clear previous errors
+        document.querySelectorAll('.error').forEach(el => el.classList.remove('error'));
+        document.querySelectorAll('.error-message').forEach(el => el.classList.add('hidden'));
+
+        // Validate required fields
+        const requiredFields = document.querySelectorAll('[required]');
+        requiredFields.forEach(field => {
+            if (!field.value.trim()) {
+                field.classList.add('error');
+                const errorEl = document.getElementById(field.id + '-error');
+                if (errorEl) {
+                    errorEl.textContent = 'This field is required';
+                    errorEl.classList.remove('hidden');
+                }
+                isValid = false;
+            }
+        });
+
+        // Validate price range
+        if (!validatePriceRange()) {
+            isValid = false;
+        }
+
+        return isValid;
+    }
+
+    function collectFormData() {
+        const category = document.getElementById('category').value;
+
+        const productData = {
+            barcode: document.getElementById('barcode').value.trim() || null,
+            title: document.getElementById('title').value.trim(),
+            category: category,
+            value: parseFloat(document.getElementById('value').value),
+            price: parseFloat(document.getElementById('price').value),
+            quantity: parseInt(document.getElementById('quantity').value),
+            warehouseEntryDate: document.getElementById('warehouseEntryDate').value,
+            dimensions: document.getElementById('dimensions').value.trim(),
+            weight: parseFloat(document.getElementById('weight').value),
+            description: document.getElementById('description').value.trim(),
+            condition: document.getElementById('condition').value,
+            rushDelivery: document.getElementById('rushDelivery').checked,
+            specificDetails: {}
+        };
+
+        // Collect category-specific details
+        switch(category) {
+            case 'Book':
+                productData.specificDetails = {
+                    authors: document.getElementById('authors').value.trim(),
+                    coverType: document.getElementById('coverType').value,
+                    publisher: document.getElementById('publisher').value.trim(),
+                    publicationDate: document.getElementById('publicationDate').value,
+                    numPages: parseInt(document.getElementById('numPages').value) || 0,
+                    language: document.getElementById('language').value.trim(),
+                    genre: document.getElementById('genre').value.trim()
+                };
+                break;
+            case 'CD':
+                productData.specificDetails = {
+                    artists: document.getElementById('cd-artists').value.trim(),
+                    recordLabel: document.getElementById('cd-recordLabel').value.trim(),
+                    tracklist: document.getElementById('cd-tracklist').value.trim(),
+                    genre: document.getElementById('cd-genre').value.trim(),
+                    releaseDate: document.getElementById('cd-releaseDate').value
+                };
+                break;
+            case 'LP':
+                productData.specificDetails = {
+                    artists: document.getElementById('lp-artists').value.trim(),
+                    recordLabel: document.getElementById('lp-recordLabel').value.trim(),
+                    tracklist: document.getElementById('lp-tracklist').value.trim(),
+                    genre: document.getElementById('lp-genre').value.trim(),
+                    releaseDate: document.getElementById('lp-releaseDate').value
+                };
+                break;
+            case 'DVD':
+                productData.specificDetails = {
+                    discType: document.getElementById('discType').value,
+                    director: document.getElementById('director').value.trim(),
+                    runtime: parseInt(document.getElementById('runtime').value),
+                    studio: document.getElementById('studio').value.trim(),
+                    language: document.getElementById('dvd-language').value.trim(),
+                    subtitles: document.getElementById('subtitles').value.trim(),
+                    releaseDate: document.getElementById('dvd-releaseDate').value,
+                    genre: document.getElementById('dvd-genre').value.trim()
+                };
+                break;
+        }
+
+        return productData;
+    }
+
+    function goBack() {
+        if (confirm('Are you sure you want to go back? All unsaved changes will be lost.')) {
+            window.location.href = '/pages/productmanager/product-management.html';
+        }
+    }
+
+    // Auto-validate price when value changes
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('value').addEventListener('blur', validatePriceRange);
+    });
+</script>
+</body>
+</html>

@@ -1,6 +1,8 @@
 package com.aims.model;
 
 import jakarta.persistence.*;
+
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Entity
@@ -30,8 +32,7 @@ public class DVD {
     private String subtitles;
 
     @Column(name = "release_date")
-    @Temporal(TemporalType.DATE)
-    private Date releaseDate;
+    private LocalDateTime releaseDate;
 
     @Column(name = "genre")
     private String genre;
@@ -98,11 +99,11 @@ public class DVD {
         this.subtitles = subtitles;
     }
 
-    public Date getReleaseDate() {
+    public LocalDateTime getReleaseDate() {
         return releaseDate;
     }
 
-    public void setReleaseDate(Date releaseDate) {
+    public void setReleaseDate(LocalDateTime releaseDate) {
         this.releaseDate = releaseDate;
     }
 

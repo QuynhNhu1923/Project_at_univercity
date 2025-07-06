@@ -12,16 +12,27 @@ public interface ProductRepository extends JpaRepository<Product, String> {
     // Sử dụng Pageable cho findByCategory
     Page<Product> findByCategory(String category, Pageable pageable);
 
+    // Tìm kiếm theo title
     Page<Product> findByTitleContainingIgnoreCase(String title, Pageable pageable);
 
-    // Sử dụng Pageable cho findByBarcode (phân trang)
+    // Tìm kiếm theo barcode với pagination
     Page<Product> findByBarcode(String barcode, Pageable pageable);
 
-    // Phương thức tìm một sản phẩm duy nhất (không phân trang)
+    // Tìm kiếm theo barcode không pagination (cho detail)
     Product findByBarcode(String barcode);
 
+    // Tìm kiếm theo barcode containing
+    Page<Product> findByBarcodeContainingIgnoreCase(String barcode, Pageable pageable);
+
+    // Tìm kiếm theo category containing
+    Page<Product> findByCategoryContainingIgnoreCase(String category, Pageable pageable);
+
+    // Tìm kiếm tổng hợp
+    Page<Product> findByBarcodeContainingIgnoreCaseOrTitleContainingIgnoreCaseOrCategoryContainingIgnoreCase(
+            String barcode, String title, String category, Pageable pageable);
+
     // Lấy sản phẩm ngẫu nhiên
-    @Query(value = "SELECT * FROM product ORDER BY RANDOM()", nativeQuery = true)
+    @Query(value = "SELECT * FROM products ORDER BY RANDOM() LIMIT ?1", nativeQuery = true)
     Page<Product> findRandom(Pageable pageable);
 
     // Xóa sản phẩm theo barcode
@@ -29,4 +40,7 @@ public interface ProductRepository extends JpaRepository<Product, String> {
     @Modifying
     @Query("DELETE FROM Product p WHERE p.barcode = ?1")
     void deleteByBarcode(String barcode);
+
+    // Kiểm tra sản phẩm tồn tại
+    boolean existsByBarcode(String barcode);
 }

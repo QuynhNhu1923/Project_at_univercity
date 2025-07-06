@@ -1,112 +1,560 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Your Cart</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Shopping Cart</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            max-width: 1200px;
-            margin-left: auto;
-            margin-right: auto;
+      body {
+        font-family: "Arial", sans-serif;
+        background: linear-gradient(135deg, #f0f2f5 0%, #e0e7ff 100%);
+        margin: 0;
+        padding: 20px;
+        color: #333;
+        min-height: 100vh;
+      }
+      .container {
+        max-width: 1000px;
+        margin: 0 auto;
+        background: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+      }
+      .header {
+        background: linear-gradient(90deg, #2c3e50, #3498db);
+        color: white;
+        padding: 20px 30px;
+        text-align: center;
+      }
+      .header h1 {
+        margin: 0;
+        font-size: 2rem;
+        font-weight: 600;
+      }
+      .content {
+        padding: 30px;
+      }
+      .cart-table-container {
+        max-height: 450px;
+        overflow-y: auto;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        background-color: #fff;
+        margin-bottom: 20px;
+        border: 1px solid #e0e7ff;
+      }
+      .cart-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 14px;
+      }
+      .cart-table th,
+      .cart-table td {
+        padding: 12px;
+        text-align: left;
+        border-bottom: 1px solid #eee;
+      }
+      .cart-table th {
+        background: linear-gradient(to right, #3498db, #2980b9);
+        color: white;
+        position: sticky;
+        top: 0;
+        z-index: 1;
+        font-weight: 600;
+      }
+      .cart-table tbody tr:hover {
+        background-color: #f8f9fa;
+      }
+      .quantity-input {
+        width: 70px;
+        padding: 5px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        text-align: center;
+        font-size: 14px;
+      }
+      .remove-btn {
+        background-color: #e74c3c;
+        color: white;
+        border: none;
+        padding: 6px 12px;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+        font-size: 12px;
+      }
+      .remove-btn:hover {
+        background-color: #c0392b;
+      }
+      .price-summary {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e8f5e8 100%);
+        border: 2px solid #28a745;
+        border-radius: 8px;
+        padding: 20px;
+        margin-top: 20px;
+      }
+      .price-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+        font-size: 14px;
+      }
+      .price-row.total {
+        font-weight: bold;
+        font-size: 1.2rem;
+        border-top: 2px solid #28a745;
+        padding-top: 15px;
+        margin-top: 15px;
+        color: #2c3e50;
+      }
+      .cart-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 15px;
+        margin-top: 30px;
+      }
+      .cart-actions button {
+        padding: 12px 25px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 500;
+        transition: all 0.3s;
+        text-decoration: none;
+        display: inline-block;
+        text-align: center;
+      }
+      #clear-cart-btn {
+        background: linear-gradient(90deg, #7f8c8d, #6c757d);
+        color: white;
+      }
+      #clear-cart-btn:hover {
+        background: linear-gradient(90deg, #6c757d, #5a6268);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(108, 117, 125, 0.3);
+      }
+      #proceed-order-btn {
+        background: linear-gradient(90deg, #2ecc71, #27ae60);
+        color: white;
+        font-size: 16px;
+        padding: 15px 30px;
+      }
+      #proceed-order-btn:hover {
+        background: linear-gradient(90deg, #27ae60, #219653);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(39, 174, 96, 0.3);
+      }
+      #back-dashboard-btn {
+        background: linear-gradient(90deg, #3498db, #2980b9);
+        color: white;
+      }
+      #back-dashboard-btn:hover {
+        background: linear-gradient(90deg, #2980b9, #1e5c8a);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(41, 128, 185, 0.3);
+      }
+      #stock-deficiency-warning {
+        background: #fff3cd;
+        color: #856404;
+        padding: 15px;
+        border: 1px solid #ffeaa7;
+        border-radius: 6px;
+        margin-top: 15px;
+        display: none;
+      }
+      .empty-cart {
+        text-align: center;
+        padding: 40px 20px;
+        color: #6c757d;
+      }
+      .empty-cart i {
+        font-size: 3rem;
+        margin-bottom: 15px;
+        color: #dee2e6;
+      }
+      .rush-delivery-badge {
+        background: #e67e22;
+        color: white;
+        padding: 2px 6px;
+        border-radius: 3px;
+        font-size: 10px;
+        margin-left: 5px;
+      }
+      @media (max-width: 768px) {
+        .container {
+          margin: 10px;
         }
-        h1 {
-            text-align: center;
-            color: #333;
+        .content {
+          padding: 20px;
         }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
+        .cart-table th,
+        .cart-table td {
+          padding: 8px;
+          font-size: 12px;
         }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 10px;
-            text-align: left;
+        .quantity-input {
+          width: 50px;
         }
-        th {
-            background-color: #f2f2f2;
-            color: #333;
+        .cart-actions {
+          flex-direction: column;
         }
-        input[type="number"] {
-            width: 60px;
-            padding: 5px;
+        .cart-actions button {
+          width: 100%;
+          margin: 5px 0;
         }
-        button {
-            padding: 8px 12px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            cursor: pointer;
-            border-radius: 4px;
-        }
-        button:hover {
-            background-color: #45a049;
-        }
-        button:disabled {
-            background-color: #ccc;
-            cursor: not-allowed;
-        }
-        .remove-btn {
-            background-color: #dc3545;
-        }
-        .remove-btn:hover {
-            background-color: #c82333;
-        }
-        .action-buttons {
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-        }
-        #stock-deficiency {
-            background-color: #fff3cd;
-            color: #856404;
-            padding: 15px;
-            margin-bottom: 20px;
-            border: 1px solid #ffeeba;
-            border-radius: 4px;
-            display: none;
-        }
-        #cart-total {
-            font-size: 1.2em;
-            font-weight: bold;
-            text-align: right;
-            margin-right: 10px;
-        }
+      }
     </style>
-</head>
-<body>
-<h1>Your Cart</h1>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>Your Shopping Cart</h1>
+      </div>
 
-<div id="stock-deficiency">
-    <h3>Stock Deficiency Warning:</h3>
-    <ul id="deficiency-items"></ul>
-</div>
+      <div class="content">
+        <div class="cart-table-container">
+          <table class="cart-table" id="cart-items">
+            <thead>
+              <tr>
+                <th>Product Name</th>
+                <th>Quantity</th>
+                <th>Price (VND)</th>
+                <th>Total (VND)</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
 
-<table id="cart-items">
-    <thead>
-    <tr>
-        <th>Product</th>
-        <th>Quantity</th>
-        <th>Price (excl. VAT)</th>
-        <th>Rush Delivery</th>
-        <th>Actions</th>
-    </tr>
-    </thead>
-    <tbody></tbody>
-</table>
+        <div class="price-summary">
+          <div class="price-row">
+            <span>Subtotal (Excluding VAT):</span>
+            <span id="cart-subtotal">0.00 VND</span>
+          </div>
+          <div class="price-row">
+            <span>VAT (10%):</span>
+            <span id="cart-vat">0.00 VND</span>
+          </div>
+          <div class="price-row total">
+            <span>Total (Including VAT):</span>
+            <span id="cart-total">0.00 VND</span>
+          </div>
+        </div>
 
-<div id="cart-total">Total (excl. VAT): 0 VND</div>
+        <div id="stock-deficiency-warning"></div>
 
-<div class="action-buttons">
-    <button onclick="checkStockAndProceed()">Proceed to Order</button>
-    <button onclick="clearCart()">Clear Cart</button>
-    <button onclick="navigateTo('/pages/customer/dashboard.html')">Back to Dashboard</button>
-</div>
+        <div class="cart-actions">
+          <div>
+            <button id="clear-cart-btn">Clear Cart</button>
+            <button id="back-dashboard-btn">Continue Shopping</button>
+          </div>
+          <div>
+            <button id="proceed-order-btn">Place Order</button>
+          </div>
+        </div>
+      </div>
+    </div>
 
-<script src="/js/main.js"></script>
-<script src="/js/cart.js"></script>
-</body>
+    <script>
+      // Global variables
+      let sessionId =
+        localStorage.getItem("sessionId") ||
+        "guest_" + Math.random().toString(36).substr(2, 9);
+      localStorage.setItem("sessionId", sessionId);
+
+      // Initialize page
+      document.addEventListener("DOMContentLoaded", () => {
+        loadCart();
+        setupEventListeners();
+      });
+
+      function setupEventListeners() {
+        // Event delegation for dynamically created elements
+        document.addEventListener("change", (e) => {
+          if (e.target.classList.contains("quantity-input")) {
+            const barcode = e.target.dataset.barcode;
+            const quantity = parseInt(e.target.value);
+            if (quantity > 0) {
+              updateCartItem(sessionId, barcode, quantity);
+            } else {
+              removeFromCart(sessionId, barcode);
+            }
+          }
+        });
+
+        document.addEventListener("click", (e) => {
+          if (e.target.classList.contains("remove-btn")) {
+            const barcode = e.target.dataset.barcode;
+            removeFromCart(sessionId, barcode);
+          }
+        });
+
+        // Action buttons
+        document
+          .getElementById("clear-cart-btn")
+          .addEventListener("click", () => {
+            if (confirm("Are you sure you want to clear your cart?")) {
+              clearCart(sessionId);
+            }
+          });
+
+        document
+          .getElementById("proceed-order-btn")
+          .addEventListener("click", () => {
+            proceedToOrder();
+          });
+
+        document
+          .getElementById("back-dashboard-btn")
+          .addEventListener("click", () => {
+            window.location.href = "customer-dashboard.html";
+          });
+      }
+
+      async function loadCart() {
+        try {
+          const response = await fetch(`/api/carts/${sessionId}`);
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+
+          const cart = await response.json();
+          displayCartItems(cart);
+          updateCartSummary(cart);
+          showStockWarnings(cart);
+        } catch (error) {
+          console.error("Error loading cart:", error);
+          showEmptyCart("Error loading cart. Please try again.");
+        }
+      }
+
+      function displayCartItems(cart) {
+        const cartTableBody = document.querySelector("#cart-items tbody");
+        cartTableBody.innerHTML = "";
+
+        if (!cart.items || cart.items.length === 0) {
+          showEmptyCart();
+          return;
+        }
+
+        const maxItems = 30;
+        const itemsToShow = cart.items.slice(0, maxItems);
+
+        itemsToShow.forEach((item) => {
+          const totalPerItem = (item.price || 0) * (item.quantity || 0);
+          const row = document.createElement("tr");
+
+          row.innerHTML = `
+                    <td>
+                        ${item.title || "N/A"}
+                        ${
+                          item.rushDelivery
+                            ? '<span class="rush-delivery-badge">Rush Available</span>'
+                            : ""
+                        }
+                    </td>
+                    <td>
+                        <input type="number"
+                               class="quantity-input"
+                               data-barcode="${item.barcode || ""}"
+                               value="${item.quantity || 1}"
+                               min="1"
+                               max="999">
+                    </td>
+                    <td>${formatCurrency(item.price || 0)}</td>
+                    <td>${formatCurrency(totalPerItem)}</td>
+                    <td>
+                        <button class="remove-btn" data-barcode="${
+                          item.barcode || ""
+                        }">Remove</button>
+                    </td>
+                `;
+
+          cartTableBody.appendChild(row);
+        });
+
+        if (cart.items.length > maxItems) {
+          const warningRow = document.createElement("tr");
+          warningRow.innerHTML = `
+                    <td colspan="5" style="text-align: center; color: #e67e22; font-style: italic;">
+                        Only the first ${maxItems} items are displayed. Please proceed to checkout to view all items.
+                    </td>
+                `;
+          cartTableBody.appendChild(warningRow);
+        }
+      }
+
+      function updateCartSummary(cart) {
+        if (!cart.items || cart.items.length === 0) {
+          document.getElementById("cart-subtotal").textContent = "0.00 VND";
+          document.getElementById("cart-vat").textContent = "0.00 VND";
+          document.getElementById("cart-total").textContent = "0.00 VND";
+          return;
+        }
+
+        const subtotal = cart.items.reduce((sum, item) => {
+          return sum + (item.price || 0) * (item.quantity || 0);
+        }, 0);
+
+        const vat = subtotal * 0.1;
+        const total = subtotal + vat;
+
+        document.getElementById("cart-subtotal").textContent =
+          formatCurrency(subtotal);
+        document.getElementById("cart-vat").textContent = formatCurrency(vat);
+        document.getElementById("cart-total").textContent =
+          formatCurrency(total);
+      }
+
+      function showStockWarnings(cart) {
+        const warningDiv = document.getElementById("stock-deficiency-warning");
+
+        if (cart.deficiencies && Object.keys(cart.deficiencies).length > 0) {
+          const deficiencyList = Object.entries(cart.deficiencies)
+            .map(([barcode, qty]) => `${barcode}: ${qty} items short`)
+            .join(", ");
+
+          warningDiv.innerHTML = `
+                    <strong>⚠️ Stock Warning:</strong> Some items in your cart exceed available inventory: ${deficiencyList}
+                    <br><small>Please adjust quantities before proceeding to checkout.</small>
+                `;
+          warningDiv.style.display = "block";
+        } else {
+          warningDiv.style.display = "none";
+        }
+      }
+
+      function showEmptyCart(message = "Your cart is empty") {
+        const cartTableBody = document.querySelector("#cart-items tbody");
+        cartTableBody.innerHTML = `
+                <tr>
+                    <td colspan="5" class="empty-cart">
+                        <div>🛒</div>
+                        <h3>${message}</h3>
+                        <p>Add some products to your cart to get started!</p>
+                    </td>
+                </tr>
+            `;
+
+        // Disable proceed button for empty cart
+        const proceedBtn = document.getElementById("proceed-order-btn");
+        proceedBtn.disabled = true;
+        proceedBtn.style.opacity = "0.5";
+        proceedBtn.style.cursor = "not-allowed";
+      }
+
+      async function updateCartItem(sessionId, barcode, quantity) {
+        try {
+          const response = await fetch(`/api/carts/${sessionId}/items`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ barcode, quantity }),
+          });
+
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+
+          await loadCart(); // Reload cart to show updated data
+          console.log("Cart item updated successfully");
+        } catch (error) {
+          console.error("Error updating cart item:", error);
+          alert("Failed to update cart item: " + error.message);
+          await loadCart(); // Reload to show current state
+        }
+      }
+
+      async function removeFromCart(sessionId, barcode) {
+        try {
+          const response = await fetch(
+            `/api/carts/${sessionId}/items/${barcode}`,
+            {
+              method: "DELETE",
+            }
+          );
+
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+
+          await loadCart(); // Reload cart
+          console.log("Item removed from cart successfully");
+        } catch (error) {
+          console.error("Error removing item from cart:", error);
+          alert("Failed to remove item: " + error.message);
+        }
+      }
+
+      async function clearCart(sessionId) {
+        try {
+          const response = await fetch(`/api/carts/${sessionId}/clear`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+          });
+
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+
+          await loadCart(); // Reload cart
+          console.log("Cart cleared successfully");
+        } catch (error) {
+          console.error("Error clearing cart:", error);
+          alert("Failed to clear cart: " + error.message);
+        }
+      }
+
+      async function proceedToOrder() {
+        try {
+          // Check if cart is empty
+          const response = await fetch(`/api/carts/${sessionId}`);
+          if (!response.ok) {
+            throw new Error("Failed to check cart status");
+          }
+
+          const cart = await response.json();
+
+          if (!cart.items || cart.items.length === 0) {
+            alert(
+              "Your cart is empty. Please add items before placing an order."
+            );
+            return;
+          }
+
+          // Check for stock deficiencies
+          if (cart.deficiencies && Object.keys(cart.deficiencies).length > 0) {
+            const confirmed = confirm(
+              "Some items in your cart are out of stock. " +
+                "Please adjust quantities or remove unavailable items before proceeding. " +
+                "Do you want to continue anyway?"
+            );
+            if (!confirmed) {
+              return;
+            }
+          }
+
+          // Redirect to order placement page
+          window.location.href = "/pages/customer/place-order.html";
+        } catch (error) {
+          console.error("Error proceeding to order:", error);
+          alert("Failed to proceed to checkout. Please try again.");
+        }
+      }
+
+      function formatCurrency(amount) {
+        return (
+          new Intl.NumberFormat("en-US", {
+            style: "decimal",
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          }).format(amount || 0) + " VND"
+        );
+      }
+    </script>
+  </body>
 </html>

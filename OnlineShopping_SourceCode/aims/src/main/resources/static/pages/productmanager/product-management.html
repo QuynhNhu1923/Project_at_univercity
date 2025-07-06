@@ -1,80 +1,416 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AIMS - Product Management</title>
-    <link rel="stylesheet" href="../../css/styles.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AIMS - Product Management</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #f5f5f5;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: white;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    h1 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 30px;
+    }
+    .toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .search-controls {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .action-buttons {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    input, select, button {
+      padding: 8px 12px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+    button {
+      background-color: #007bff;
+      color: white;
+      border: none;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    .btn-danger {
+      background-color: #dc3545;
+    }
+    .btn-danger:hover {
+      background-color: #c82333;
+    }
+    .btn-success {
+      background-color: #28a745;
+    }
+    .btn-success:hover {
+      background-color: #218838;
+    }
+    .btn-secondary {
+      background-color: #6c757d;
+    }
+    .btn-secondary:hover {
+      background-color: #545b62;
+    }
+    .table-container {
+      overflow-x: auto;
+      margin: 20px 0;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+    }
+    th, td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+    th {
+      background-color: #f8f9fa;
+      font-weight: bold;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+    tr:hover {
+      background-color: #f5f5f5;
+    }
+    .checkbox-column {
+      width: 50px;
+      text-align: center;
+    }
+    .actions-column {
+      width: 120px;
+      text-align: center;
+    }
+    .pagination {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 20px;
+    }
+    .pagination button {
+      min-width: 100px;
+    }
+    .pagination button:disabled {
+      background-color: #e9ecef;
+      color: #6c757d;
+      cursor: not-allowed;
+    }
+    .limits-info {
+      background-color: #e3f2fd;
+      padding: 15px;
+      border-radius: 4px;
+      margin-bottom: 20px;
+      border-left: 4px solid #2196f3;
+    }
+    .limits-info h3 {
+      margin: 0 0 10px 0;
+      color: #1976d2;
+    }
+    .limits-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin-top: 10px;
+    }
+    .limit-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 12px;
+      background: white;
+      border-radius: 4px;
+      border: 1px solid #e0e0e0;
+    }
+    .limit-value {
+      font-weight: bold;
+      color: #333;
+    }
+    .limit-exceeded {
+      color: #d32f2f;
+    }
+    .limit-ok {
+      color: #388e3c;
+    }
+    .error-message {
+      background-color: #ffebee;
+      color: #c62828;
+      padding: 10px;
+      border-radius: 4px;
+      margin: 10px 0;
+      border-left: 4px solid #f44336;
+    }
+    .success-message {
+      background-color: #e8f5e8;
+      color: #2e7d32;
+      padding: 10px;
+      border-radius: 4px;
+      margin: 10px 0;
+      border-left: 4px solid #4caf50;
+    }
+    .loading {
+      text-align: center;
+      padding: 20px;
+      color: #666;
+    }
+    @media (max-width: 768px) {
+      .container {
+        padding: 15px;
+      }
+      .toolbar {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .search-controls {
+        justify-content: center;
+      }
+      .action-buttons {
+        justify-content: center;
+      }
+      .table-container {
+        font-size: 12px;
+      }
+      th, td {
+        padding: 8px;
+      }
+    }
+  </style>
 </head>
 <body>
 <div class="container">
-    <div id="product-management-section" class="section">
-        <h2>Manage Products</h2>
-        <form id="product-form" onsubmit="addProduct(event)">
-            <div class="form-group">
-                <label for="product-type">Type:</label>
-                <select id="product-type" required>
-                    <option value="BOOK">Book</option>
-                    <option value="CD">CD</option>
-                    <option value="LP">LP</option>
-                    <option value="DVD">DVD</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="product-name-input">Name:</label>
-                <input type="text" id="product-name-input" required>
-            </div>
-            <div class="form-group">
-                <label for="product-price-input">Price (VND):</label>
-                <input type="number" id="product-price-input" min="0" step="0.01" required>
-            </div>
-            <div class="form-group">
-                <label for="product-stock-input">Stock:</label>
-                <input type="number" id="product-stock-input" min="0" required>
-            </div>
-            <div class="form-group">
-                <label for="product-release-date">Release Date:</label>
-                <input type="date" id="product-release-date">
-            </div>
-            <div class="form-group">
-                <label for="product-author">Author/Artist:</label>
-                <input type="text" id="product-author">
-            </div>
-            <div class="form-group">
-                <label for="product-description-input">Description:</label>
-                <textarea id="product-description-input" required></textarea>
-            </div>
-            <div class="form-group">
-                <label for="rush-supported">Rush Delivery Supported:</label>
-                <input type="checkbox" id="rush-supported">
-            </div>
-            <button type="submit">Add Product</button>
-            <button type="button" onclick="updateProduct()">Update Product</button>
-            <p id="product-error" class="error hidden"></p>
-        </form>
-        <table id="product-manager-list">
-            <thead>
-            <tr>
-                <th>Select</th>
-                <th>Name</th>
-                <th>Type</th>
-                <th>Price</th>
-                <th>Stock</th>
-                <th>Rush Delivery</th>
-            </tr>
-            </thead>
-            <tbody></tbody>
-        </table>
-        <button onclick="deleteSelectedProducts()">Delete Selected</button>
-        <div class="pagination">
-            <button onclick="prevProductManagerPage()">Previous</button>
-            <button onclick="nextProductManagerPage()">Next</button>
-        </div>
-        <button onclick="navigateTo('productmanager/dashboard.html')">Back</button>
+  <h1>Product Management</h1>
+
+  <!-- Daily Limits Info -->
+  <div id="limits-info" class="limits-info" style="display: none;">
+    <h3>Daily Operation Limits</h3>
+    <div class="limits-grid">
+      <div class="limit-item">
+        <span>Updates Today:</span>
+        <span id="update-count" class="limit-value">-</span>
+      </div>
+      <div class="limit-item">
+        <span>Deletes Today:</span>
+        <span id="delete-count" class="limit-value">-</span>
+      </div>
+      <div class="limit-item">
+        <span>Remaining Updates:</span>
+        <span id="remaining-updates" class="limit-value">-</span>
+      </div>
+      <div class="limit-item">
+        <span>Remaining Deletes:</span>
+        <span id="remaining-deletes" class="limit-value">-</span>
+      </div>
     </div>
+  </div>
+
+  <!-- Toolbar -->
+  <div class="toolbar">
+    <div class="search-controls">
+      <select id="search-field">
+        <option value="barcode">Search by Barcode</option>
+        <option value="title">Search by Title</option>
+        <option value="category">Search by Category</option>
+        <option value="all">Search All Fields</option>
+      </select>
+      <input type="text" id="search-input" placeholder="Enter search term...">
+      <button id="search-button">Search</button>
+      <button id="clear-search-button" class="btn-secondary">Clear</button>
+    </div>
+
+    <div class="action-buttons">
+      <button id="add-product-btn" class="btn-success">Add Product</button>
+      <button id="delete-selected-btn" class="btn-danger">Delete Selected</button>
+      <button id="refresh-btn" class="btn-secondary">Refresh</button>
+      <button onclick="window.location.href='/pages/productmanager/dashboard.html'" class="btn-secondary">Back to Dashboard</button>
+    </div>
+  </div>
+
+  <!-- Error/Success Messages -->
+  <div id="message-container"></div>
+
+  <!-- Product Table -->
+  <div class="table-container">
+    <table id="product-manager-table">
+      <thead>
+      <tr>
+        <th class="checkbox-column">
+          <input type="checkbox" id="select-all">
+        </th>
+        <th>Barcode</th>
+        <th>Title</th>
+        <th>Category</th>
+        <th>Price (VND)</th>
+        <th>Rush Delivery</th>
+        <th>Quantity</th>
+        <th class="actions-column">Actions</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr>
+        <td colspan="8" class="loading">Loading products...</td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination -->
+  <div class="pagination">
+    <button id="prev-page" disabled>Previous</button>
+    <span id="page-info">Page 1 of 1</span>
+    <button id="next-page" disabled>Next</button>
+  </div>
 </div>
-<script src="/js/main.js"></script>
-<script src="/js/navigation.js"></script>
+
 <script src="/js/product.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Initialize page
+    loadDailyLimits();
+
+    // Search functionality
+    document.getElementById('search-button').addEventListener('click', performSearch);
+    document.getElementById('search-input').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        performSearch();
+      }
+    });
+
+    // Clear search
+    document.getElementById('clear-search-button').addEventListener('click', function() {
+      document.getElementById('search-input').value = '';
+      loadProductManagerList();
+    });
+
+    // Add product
+    document.getElementById('add-product-btn').addEventListener('click', function() {
+      window.location.href = '/pages/productmanager/add-product.html';
+    });
+
+    // Refresh
+    document.getElementById('refresh-btn').addEventListener('click', function() {
+      loadProductManagerList();
+      loadDailyLimits();
+    });
+
+    // Select all checkbox
+    document.getElementById('select-all').addEventListener('change', function() {
+      const checkboxes = document.querySelectorAll('tbody input[type="checkbox"]');
+      checkboxes.forEach(cb => cb.checked = this.checked);
+    });
+  });
+
+  function performSearch() {
+    const field = document.getElementById('search-field').value;
+    const keyword = document.getElementById('search-input').value.trim();
+
+    if (keyword) {
+      searchProducts();
+    } else {
+      loadProductManagerList();
+    }
+  }
+
+  async function loadDailyLimits() {
+    try {
+      const response = await fetch('/api/products/daily-limits', {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
+        }
+      });
+
+      if (response.ok) {
+        const limits = await response.json();
+        updateLimitsDisplay(limits);
+      }
+    } catch (error) {
+      console.error('Error loading daily limits:', error);
+    }
+  }
+
+  function updateLimitsDisplay(limits) {
+    const limitsInfo = document.getElementById('limits-info');
+
+    if (limits.error) {
+      limitsInfo.style.display = 'none';
+      return;
+    }
+
+    limitsInfo.style.display = 'block';
+
+    const updateCount = limits.updateCount || 0;
+    const deleteCount = limits.deleteCount || 0;
+    const remainingUpdates = limits.remainingUpdates || 0;
+    const remainingDeletes = limits.remainingDeletes || 0;
+
+    document.getElementById('update-count').textContent = `${updateCount}/30`;
+    document.getElementById('delete-count').textContent = `${deleteCount}/30`;
+    document.getElementById('remaining-updates').textContent = remainingUpdates;
+    document.getElementById('remaining-deletes').textContent = remainingDeletes;
+
+    // Color coding
+    const updateCountEl = document.getElementById('update-count');
+    const deleteCountEl = document.getElementById('delete-count');
+
+    updateCountEl.className = updateCount >= 30 ? 'limit-value limit-exceeded' : 'limit-value limit-ok';
+    deleteCountEl.className = deleteCount >= 30 ? 'limit-value limit-exceeded' : 'limit-value limit-ok';
+  }
+
+  function showMessage(message, isError = false) {
+    const container = document.getElementById('message-container');
+    const messageDiv = document.createElement('div');
+    messageDiv.className = isError ? 'error-message' : 'success-message';
+    messageDiv.textContent = message;
+
+    container.innerHTML = '';
+    container.appendChild(messageDiv);
+
+    // Auto-hide after 5 seconds
+    setTimeout(() => {
+      if (container.contains(messageDiv)) {
+        container.removeChild(messageDiv);
+      }
+    }, 5000);
+  }
+
+  function updatePageInfo(currentPage, totalPages) {
+    const pageInfo = document.getElementById('page-info');
+    pageInfo.textContent = `Page ${currentPage + 1} of ${totalPages || 1}`;
+  }
+
+  // Override the pagination update function
+  const originalUpdatePagination = window.updatePagination;
+  window.updatePagination = function(totalPages, currentPage) {
+    updatePageInfo(currentPage, totalPages);
+    if (originalUpdatePagination) {
+      originalUpdatePagination(totalPages, currentPage);
+    }
+  };
+</script>
 </body>
 </html>

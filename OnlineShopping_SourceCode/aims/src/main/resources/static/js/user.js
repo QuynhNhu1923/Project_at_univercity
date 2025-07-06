@@ -169,7 +169,7 @@ async function changeAdminPassword(event) {
         });
         alert('Password changed successfully.');
         document.getElementById('change-password-form').reset();
-        navigateTo('admin/dashboard.html');
+        navigateTo('admin/customer-dashboard.html');
     } catch (error) {
         errorElement.textContent = 'Error changing password: ' + error.message;
         errorElement.classList.remove('hidden');

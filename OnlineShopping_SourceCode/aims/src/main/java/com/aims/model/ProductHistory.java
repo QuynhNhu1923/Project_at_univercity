@@ -4,15 +4,14 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "Product_History")
+@Table(name = "product_history")
 public class ProductHistory {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "history_id")
-    private Integer historyId;
+    private Long id;
 
-    @Column(name = "barcode")
+    @Column(name = "barcode", nullable = false)
     private String barcode;
 
     @Column(name = "operation", nullable = false)
@@ -22,19 +21,19 @@ public class ProductHistory {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @Column(name = "operation_date")
-    private LocalDateTime operationDate = LocalDateTime.now();
+    @Column(name = "operation_date", nullable = false)
+    private LocalDateTime operationDate;
 
     @Column(name = "details")
-    private String details; // JSONB in PostgreSQL, map as String in JPA
+    private String details;
 
     // Getters and setters
-    public Integer getHistoryId() {
-        return historyId;
+    public Long getId() {
+        return id;
     }
 
-    public void setHistoryId(Integer historyId) {
-        this.historyId = historyId;
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getBarcode() {

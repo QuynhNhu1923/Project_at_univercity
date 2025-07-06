@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 @Table(name = "cart_items")
 @IdClass(CartItemId.class)
 public class CartItem {
+
     @Id
     @Column(name = "session_id")
     private String sessionId;
@@ -15,15 +16,16 @@ public class CartItem {
     private String barcode;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "session_id", insertable = false, updatable = false)
+    @JoinColumn(name = "session_id", referencedColumnName = "session_id", insertable = false, updatable = false)
     private Cart cart;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "barcode", insertable = false, updatable = false)
+    @JoinColumn(name = "barcode", referencedColumnName = "barcode", insertable = false, updatable = false)
     private Product product;
 
     @Column(name = "quantity")
     private int quantity;
+
     public CartItem() {}
 
     public CartItem(Cart cart, Product product, int quantity) {
@@ -34,7 +36,7 @@ public class CartItem {
         this.quantity = quantity;
     }
 
-    // Getters and Setters
+    // Getters and setters
     public String getSessionId() {
         return sessionId;
     }
@@ -56,7 +58,6 @@ public class CartItem {
     }
 
     public void setCart(Cart cart) {
-        this.sessionId = cart.getSessionId();
         this.cart = cart;
     }
 
@@ -65,7 +66,6 @@ public class CartItem {
     }
 
     public void setProduct(Product product) {
-        this.barcode = product.getBarcode();
         this.product = product;
     }
 
@@ -75,14 +75,5 @@ public class CartItem {
 
     public void setQuantity(int quantity) {
         this.quantity = quantity;
-    }
-
-    public CartItemId getId() {
-        return new CartItemId(sessionId, barcode);
-    }
-
-    public void setId(CartItemId id) {
-        this.sessionId = id.getSessionId();
-        this.barcode = id.getBarcode();
     }
 }

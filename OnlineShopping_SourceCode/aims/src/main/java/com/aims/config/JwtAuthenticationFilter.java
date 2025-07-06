@@ -41,7 +41,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
-
             throws ServletException, IOException {
         logger.debug("Request URI: " + request.getRequestURI());
         logger.debug("Request Method: " + request.getMethod());
@@ -51,8 +50,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String method = request.getMethod();
 
         String header = request.getHeader("Authorization");
-        //logger.debug("Processing request: {} {}", method, path);
-        //logger.debug("Authorization header: {}", header);
         logger.debug("Request Path: " + request.getRequestURI());
         logger.debug("Request Method: " + request.getMethod());
         logger.debug("Header Authorization: " + request.getHeader("Authorization"));
@@ -72,15 +69,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         .parseSignedClaims(token)
                         .getPayload();
 
-                String username = claims.getSubject();
-                if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                    UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+                String email = claims.getSubject();
+                if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                    UserDetails userDetails = userDetailsService.loadUserByUsername(email);
                     if (userDetails != null) {
                         UsernamePasswordAuthenticationToken authentication =
                                 new UsernamePasswordAuthenticationToken(
                                         userDetails, null, userDetails.getAuthorities());
                         SecurityContextHolder.getContext().setAuthentication(authentication);
-                        logger.debug("Authenticated user: {}", username);
+                        logger.debug("Authenticated user: {}", email);
                     }
                 }
             } catch (Exception e) {
@@ -95,29 +92,21 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private boolean isPublicApi(HttpServletRequest request) {
         String path = request.getRequestURI();
         String method = request.getMethod();
-        System.out.println("DEBUG PATH: " + path);
-        System.out.println("/api/carts/guest_123/items".matches("^/api/carts/[^/]+/items$")); // true
-        System.out.println("/api/carts//items".matches("^/api/carts/[^/]+/items$"));          // false
-        System.out.println("Current match: " + path.matches("^/api/carts/[^/]+/items$"));
-        // Cho phép tất cả request OPTIONS (CORS preflight)
         if ("OPTIONS".equalsIgnoreCase(method)) return true;
-
-        // Cho phép thêm item vào giỏ với sessionId bất kỳ
-        if ("POST".equalsIgnoreCase(method) && path.matches("^/api/carts/[^/]+/items$")) {
-            return true;
-        }
-
-        // Các endpoint công khai khác
+        if ("POST".equalsIgnoreCase(method) && path.matches("^/api/carts/[^/]+/items$")) return true;
         return path.startsWith("/api/auth") ||
                 path.startsWith("/api/products") ||
                 path.startsWith("/api/orders") ||
                 path.startsWith("/api/payments") ||
+                path.startsWith("/api/carts/") ||
+                path.startsWith("/api/product-history/") || // Thêm để công khai
                 path.startsWith("/pages/") ||
                 path.startsWith("/js/") ||
                 path.startsWith("/css/") ||
                 path.equals("/favicon.ico") ||
                 path.equals("/index.html") ||
-                path.equals("/role-selection.html");
+                path.equals("/role-selection.html") ||
+                path.equals("/error");
     }
 
     public String generateToken(UserDetails userDetails) {

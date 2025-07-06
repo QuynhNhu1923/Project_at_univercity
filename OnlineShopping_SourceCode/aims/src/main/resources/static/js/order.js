@@ -1,212 +1,428 @@
-/* Đặt hàng */
-async function placeOrder(event) {
-    event.preventDefault();
-    const orderData = {
-        name: document.getElementById('order-name').value,
-        email: document.getElementById('order-email').value,
-        phone: document.getElementById('order-phone').value,
-        address: document.getElementById('order-address').value,
-        rushOrder: document.getElementById('rush-order').checked,
-        deliveryTime: document.getElementById('delivery-time').value || null,
-        deliveryInstructions: document.getElementById('delivery-instructions').value || '',
-        cardNumber: document.getElementById('card-number').value,
-        cardExpiry: document.getElementById('card-expiry').value,
-        cardCvc: document.getElementById('card-cvc').value,
-        sessionId
-    };
-    const errorElement = document.getElementById('order-error');
-    errorElement.classList.add('hidden');
-    try {
-        const stockResponse = await fetch(`http://localhost:8080/api/carts/${sessionId}/check-stock`);
-        if (!stockResponse.ok) throw new Error('Some products are out of stock.');
-        const paymentResponse = await initiateVNPayPayment(orderData);
-        if (!paymentResponse.success) throw new Error('Payment initiation failed.');
-        const response = await fetch('http://localhost:8080/api/orders', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ ...orderData, paymentId: paymentResponse.paymentId })
-        });
-        if (!response.ok) throw new Error('Failed to place order.');
-        alert('Order placed successfully.');
-        sessionStorage.setItem('orderEmail', orderData.email);
-        cart = [];
-        sessionId = Math.random().toString(36).substring(2);
-        navigateTo('customer/dashboard.html');
-    } catch (error) {
-        errorElement.textContent = 'Error placing order: ' + error.message;
-        errorElement.classList.remove('hidden');
-    }
+/* Enhanced order.js with proper VNPay integration and rush order handling */
+
+// Global variables
+let sessionId =
+  localStorage.getItem("sessionId") ||
+  "guest_" + Math.random().toString(36).substr(2, 9);
+let cart = [];
+let isRushOrderSelected = false;
+
+document.addEventListener("DOMContentLoaded", () => {
+  loadOrderPageData();
+  setupEventListeners();
+});
+
+function setupEventListeners() {
+  // Rush order checkbox
+  const rushOrderCheckbox = document.getElementById("rush-order");
+  if (rushOrderCheckbox) {
+    rushOrderCheckbox.addEventListener("change", toggleRushOrderDetails);
+  }
+
+  // Province/city change for delivery fee calculation
+  const provinceInput = document.getElementById("order-province");
+  if (provinceInput) {
+    provinceInput.addEventListener("change", calculateDeliveryFee);
+    provinceInput.addEventListener("blur", calculateDeliveryFee);
+  }
+
+  // Address input for rush order validation
+  const addressInput = document.getElementById("order-address");
+  if (addressInput) {
+    addressInput.addEventListener("blur", validateRushOrderEligibility);
+  }
 }
 
-/* Tải danh sách đơn hàng của khách hàng */
-async function loadCustomerOrders() {
-    const email = document.getElementById('order-email').value || sessionStorage.getItem('orderEmail') || '';
-    if (!email) {
-        alert('Please enter an email to view orders.');
-        return;
+async function loadOrderPageData() {
+  try {
+    // Load cart data
+    const response = await fetch(`/api/carts/${sessionId}`);
+    if (!response.ok) throw new Error("Failed to load cart");
+
+    const cartData = await response.json();
+    cart = cartData.items || [];
+
+    if (cart.length === 0) {
+      alert("Your cart is empty. Redirecting to products page.");
+      window.location.href = "../pages/customer/customer-dashboard.html";
+      return;
     }
-    try {
-        const response = await fetch(`http://localhost:8080/api/orders?page=${currentPage('orders')}&size=30&email=${encodeURIComponent(email)}`);
-        if (!response.ok) throw new Error('Failed to fetch orders.');
-        const data = await response.json();
-        const orderList = document.querySelector('#customer-orders tbody');
-        orderList.innerHTML = '';
-        data.content.forEach(order => {
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>${order.id}</td>
-                <td>${new Date(order.date).toLocaleDateString()}</td>
-                <td>${order.total} VND</td>
-                <td>${order.status}</td>
-                <td>
-                    <button onclick="viewOrderDetails(${order.id})">View</button>
-                    <button onclick="cancelOrder(${order.id})" ${order.status !== 'PENDING' ? 'disabled' : ''}>Cancel</button>
-                </td>
-            `;
-            orderList.appendChild(row);
-        });
-    } catch (error) {
-        alert('Error loading orders: ' + error.message);
-    }
+
+    // Check for rush delivery eligibility
+    checkRushDeliveryEligibility();
+
+    // Calculate initial delivery fee
+    calculateDeliveryFee();
+
+    console.log("Order page loaded with cart:", cart);
+  } catch (error) {
+    console.error("Error loading order page:", error);
+    alert("Error loading order data: " + error.message);
+  }
 }
 
-/* Xem chi tiết đơn hàng */
-async function viewOrderDetails(orderId) {
-    try {
-        const response = await fetch(`http://localhost:8080/api/orders/${orderId}`);
-        if (!response.ok) throw new Error('Failed to fetch order details.');
-        const order = await response.json();
-        alert(`Order ID: ${order.id}\nCustomer: ${order.customerName}\nTotal: ${order.total} VND\nStatus: ${order.status}`);
-    } catch (error) {
-        alert('Error fetching order details: ' + error.message);
+function checkRushDeliveryEligibility() {
+  // Check if any products support rush delivery
+  const rushEligibleProducts = cart.filter((item) => item.rushDelivery);
+  const rushOrderSection = document.querySelector(".rush-order-section");
+
+  if (rushEligibleProducts.length === 0) {
+    // Disable rush order option if no products support it
+    const rushCheckbox = document.getElementById("rush-order");
+    if (rushCheckbox) {
+      rushCheckbox.disabled = true;
+      rushCheckbox.parentElement.style.opacity = "0.5";
     }
-}
-
-/* Hủy đơn hàng */
-async function cancelOrder(orderId) {
-    try {
-        const orderResponse = await fetch(`http://localhost:8080/api/orders/${orderId}`);
-        const order = await orderResponse.json();
-        const refundResponse = await initiateVNPayRefund(order.paymentId, order.total);
-        if (!refundResponse.success) throw new Error('Refund failed.');
-        const response = await fetch(`http://localhost:8080/api/orders/${orderId}/cancel`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ refundId: refundResponse.refundId })
-        });
-        if (!response.ok) throw new Error('Failed to cancel order.');
-        alert('Order cancelled and refunded.');
-        loadCustomerOrders();
-    } catch (error) {
-        alert('Error cancelling order: ' + error.message);
+    if (rushOrderSection) {
+      rushOrderSection.style.display = "none";
     }
-}
-
-/* Tải danh sách đơn hàng chờ xử lý */
-async function loadPendingOrders() {
-    try {
-        const response = await fetch(`http://localhost:8080/api/orders?page=${currentPage('pendingOrders')}&size=30&status=PENDING`);
-        if (!response.ok) throw new Error('Failed to fetch pending orders.');
-        const data = await response.json();
-        const orderList = document.querySelector('#pending-orders tbody');
-        orderList.innerHTML = '';
-        data.content.forEach(order => {
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>${order.id}</td>
-                <td>${order.customerName}</td>
-                <td>${order.total} VND</td>
-                <td>${order.status}</td>
-                <td>
-                    <button onclick="approveOrder(${order.id})">Approve</button>
-                    <button onclick="rejectOrder(${order.id})">Reject</button>
-                </td>
-            `;
-            orderList.appendChild(row);
-        });
-    } catch (error) {
-        alert('Error loading pending orders: ' + error.message);
+  } else {
+    // Show rush order option
+    if (rushOrderSection) {
+      rushOrderSection.style.display = "block";
     }
+  }
 }
 
-/* Duyệt đơn hàng */
-async function approveOrder(orderId) {
-    try {
-        const stockResponse = await fetch(`http://localhost:8080/api/orders/${orderId}/check-stock`);
-        if (!stockResponse.ok) throw new Error('Insufficient stock for some products.');
-        const response = await fetch(`http://localhost:8080/api/orders/${orderId}/approve`, {
-            method: 'PUT'
-        });
-        if (!response.ok) throw new Error('Failed to approve order.');
-        alert('Order approved.');
-        loadPendingOrders();
-    } catch (error) {
-        alert('Error approving order: ' + error.message);
-    }
+function validateRushOrderEligibility() {
+  const address = document.getElementById("order-address").value;
+  const province = document.getElementById("order-province").value;
+  const rushCheckbox = document.getElementById("rush-order");
+
+  // Check if address is in Hanoi inner city districts
+  const hanoiDistricts = [
+    "Ba Đình",
+    "Hoàn Kiếm",
+    "Tây Hồ",
+    "Long Biên",
+    "Cầu Giấy",
+    "Đống Đa",
+    "Hai Bà Trưng",
+    "Hoàng Mai",
+    "Thanh Xuân",
+    "Nam Từ Liêm",
+    "Bắc Từ Liêm",
+    "Hà Đông",
+  ];
+
+  const isHanoiInnerCity =
+    province.toLowerCase().includes("hanoi") ||
+    province.toLowerCase().includes("hà nội") ||
+    hanoiDistricts.some((district) =>
+      address.toLowerCase().includes(district.toLowerCase())
+    );
+
+  if (rushCheckbox && rushCheckbox.checked && !isHanoiInnerCity) {
+    alert(
+      "Rush delivery is only available for addresses within Hanoi inner city districts."
+    );
+    rushCheckbox.checked = false;
+    toggleRushOrderDetails();
+  }
+
+  return isHanoiInnerCity;
 }
 
-/* Từ chối đơn hàng */
-async function rejectOrder(orderId) {
-    try {
-        const orderResponse = await fetch(`http://localhost:8080/api/orders/${orderId}`);
-        const order = await orderResponse.json();
-        const refundResponse = await initiateVNPayRefund(order.paymentId, order.total);
-        if (!refundResponse.success) throw new Error('Refund failed.');
-        const response = await fetch(`http://localhost:8080/api/orders/${orderId}/reject`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ refundId: refundResponse.refundId })
-        });
-        if (!response.ok) throw new Error('Failed to reject order.');
-        alert('Order rejected and refunded.');
-        loadPendingOrders();
-    } catch (error) {
-        alert('Error rejecting order: ' + error.message);
-    }
-}
-
-/* Cập nhật tổng tiền và phí giao hàng */
-function updateOrderSummary() {
-    const rushOrder = document.getElementById('rush-order').checked;
-    let deliveryFee = rushOrder ? 50000 : 30000;
-    let total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
-    total = total * 1.1; // Thêm 10% VAT
-    total += deliveryFee;
-    document.getElementById('delivery-fee').textContent = `${deliveryFee} VND`;
-    document.getElementById('order-total').textContent = `${total} VND`;
-}
-
-/* Hiển thị/ẩn chi tiết giao hàng hỏa tốc */
 function toggleRushOrderDetails() {
-    const rushOrderDetails = document.getElementById('rush-order-details');
-    const rushOrder = document.getElementById('rush-order').checked;
-    rushOrderDetails.classList.toggle('hidden', !rushOrder);
-    if (rushOrder && !/Hanoi/i.test(document.getElementById('order-address').value)) {
-        alert('Rush delivery is only available in Hanoi.');
-        document.getElementById('rush-order').checked = false;
-        rushOrderDetails.classList.add('hidden');
+  const rushOrderDetails = document.getElementById("rush-order-details");
+  const rushCheckbox = document.getElementById("rush-order");
+  isRushOrderSelected = rushCheckbox ? rushCheckbox.checked : false;
+
+  if (rushOrderDetails) {
+    rushOrderDetails.classList.toggle("hidden", !isRushOrderSelected);
+  }
+
+  // Validate address for rush order
+  if (isRushOrderSelected) {
+    const isEligible = validateRushOrderEligibility();
+    if (!isEligible) {
+      return; // Exit if not eligible
     }
-    updateOrderSummary();
+  }
+
+  calculateDeliveryFee();
 }
 
-/* Điều hướng trang trước/sau */
-function prevOrderPage() {
-    if (currentPage('orders') > 0) {
-        updateCurrentPage('orders', currentPage('orders') - 1);
-        loadCustomerOrders();
+function calculateDeliveryFee() {
+  const province = document.getElementById("order-province")?.value || "";
+  const totalWeight = cart.reduce((sum, item) => {
+    // Assuming weight is stored in product data, default to 0.5kg if not available
+    const weight = item.weight || 0.5;
+    return Math.max(sum, weight * item.quantity);
+  }, 0);
+
+  let deliveryFee = 0;
+  let rushDeliveryFee = 0;
+
+  // Check if location qualifies for different shipping rates
+  const isHanoiOrHCM =
+    province.toLowerCase().includes("hanoi") ||
+    province.toLowerCase().includes("hà nội") ||
+    province.toLowerCase().includes("ho chi minh") ||
+    province.toLowerCase().includes("hồ chí minh");
+
+  if (isHanoiOrHCM) {
+    // Hanoi/HCM: 22,000 VND for first 3kg
+    deliveryFee = 22000;
+    if (totalWeight > 3) {
+      const extraWeight = Math.ceil((totalWeight - 3) * 2); // Convert to 0.5kg units
+      deliveryFee += extraWeight * 2500;
     }
-}
-function nextOrderPage() {
-    updateCurrentPage('orders', currentPage('orders') + 1);
-    loadCustomerOrders();
-}
-function prevPendingOrderPage() {
-    if (currentPage('pendingOrders') > 0) {
-        updateCurrentPage('pendingOrders', currentPage('pendingOrders') - 1);
-        loadPendingOrders();
+  } else {
+    // Other provinces: 30,000 VND for first 0.5kg
+    deliveryFee = 30000;
+    if (totalWeight > 0.5) {
+      const extraWeight = Math.ceil((totalWeight - 0.5) * 2); // Convert to 0.5kg units
+      deliveryFee += extraWeight * 2500;
     }
+  }
+
+  // Calculate subtotal (excluding VAT)
+  const subtotal = cart.reduce(
+    (sum, item) => sum + item.price * item.quantity,
+    0
+  );
+
+  // Check for free shipping eligibility (orders > 100,000 VND, max 25,000 VND discount)
+  if (subtotal > 100000) {
+    const discount = Math.min(deliveryFee, 25000);
+    deliveryFee = Math.max(0, deliveryFee - discount);
+  }
+
+  // Rush delivery fee calculation
+  if (isRushOrderSelected) {
+    const rushEligibleItems = cart.filter((item) => item.rushDelivery);
+    rushDeliveryFee = rushEligibleItems.reduce(
+      (sum, item) => sum + item.quantity * 10000,
+      0
+    );
+  }
+
+  // Update UI
+  updateOrderSummary(subtotal, deliveryFee, rushDeliveryFee);
 }
-function nextPendingOrderPage() {
-    updateCurrentPage('pendingOrders', currentPage('pendingOrders') + 1);
-    loadPendingOrders();
+
+function updateOrderSummary(subtotal, deliveryFee, rushDeliveryFee) {
+  const subtotalWithVAT = subtotal * 1.1; // Add 10% VAT
+  const totalDeliveryFee = deliveryFee + rushDeliveryFee;
+  const grandTotal = subtotalWithVAT + totalDeliveryFee;
+
+  // Update delivery fee display
+  const deliveryFeeElement = document.getElementById("delivery-fee");
+  if (deliveryFeeElement) {
+    if (rushDeliveryFee > 0) {
+      deliveryFeeElement.innerHTML = `
+                Regular: ${formatCurrency(deliveryFee)}<br>
+                Rush: ${formatCurrency(rushDeliveryFee)}<br>
+                Total: ${formatCurrency(totalDeliveryFee)}
+            `;
+    } else {
+      deliveryFeeElement.textContent = formatCurrency(deliveryFee);
+    }
+  }
+
+  // Update total
+  const totalElement = document.getElementById("order-total");
+  if (totalElement) {
+    totalElement.textContent = formatCurrency(grandTotal);
+  }
+
+  // Store calculated values for order submission
+  window.orderCalculation = {
+    subtotal,
+    subtotalWithVAT,
+    deliveryFee,
+    rushDeliveryFee,
+    totalDeliveryFee,
+    grandTotal,
+  };
+}
+
+async function placeOrder(event) {
+  event.preventDefault();
+
+  // Validate form
+  const formData = {
+    customerName: document.getElementById("order-name").value.trim(),
+    email: document.getElementById("order-email").value.trim(),
+    phone: document.getElementById("order-phone").value.trim(),
+    provinceCity: document.getElementById("order-province").value.trim(),
+    deliveryAddress: document.getElementById("order-address").value.trim(),
+    deliveryMethod: isRushOrderSelected ? "rush" : "standard",
+  };
+
+  // Validate required fields
+  if (
+    !formData.customerName ||
+    !formData.email ||
+    !formData.phone ||
+    !formData.provinceCity ||
+    !formData.deliveryAddress
+  ) {
+    showError("Please fill in all required fields.");
+    return;
+  }
+
+  // Validate email
+  if (!isValidEmail(formData.email)) {
+    showError("Please enter a valid email address.");
+    return;
+  }
+
+  // Validate phone
+  if (!isValidPhone(formData.phone)) {
+    showError("Please enter a valid phone number.");
+    return;
+  }
+
+  // Check cart one more time
+  if (cart.length === 0) {
+    showError("Your cart is empty.");
+    return;
+  }
+
+  // Final stock check
+  try {
+    const stockResponse = await fetch(`/api/carts/${sessionId}`);
+    const cartData = await stockResponse.json();
+
+    if (
+      cartData.status === "WARNING" ||
+      Object.keys(cartData.deficiencies || {}).length > 0
+    ) {
+      showError(
+        "Some items in your cart are out of stock. Please update your cart."
+      );
+      return;
+    }
+  } catch (error) {
+    console.error("Error checking stock:", error);
+    showError("Error validating stock. Please try again.");
+    return;
+  }
+
+  // Prepare order data
+  const orderData = {
+    ...formData,
+    deliveryFee: window.orderCalculation.totalDeliveryFee,
+    totalAmount: window.orderCalculation.grandTotal,
+    items: cart.map((item) => ({
+      barcode: item.barcode,
+      quantity: item.quantity,
+      price: item.price,
+    })),
+  };
+
+  // Add rush order details if applicable
+  if (isRushOrderSelected) {
+    orderData.rushOrderDetails = {
+      deliveryTime: document.getElementById("delivery-time").value,
+      deliveryInstructions:
+        document.getElementById("delivery-instructions").value || "",
+    };
+  }
+
+  try {
+    showLoading(true);
+
+    // Create order and get payment URL
+    const response = await fetch("/api/orders/from-cart", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(orderData),
+      // Add sessionId as query parameter
+      ...{ url: `/api/orders/from-cart?sessionId=${sessionId}` },
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || "Failed to create order");
+    }
+
+    const result = await response.json();
+
+    if (result.success && result.paymentUrl) {
+      // Store order info for reference
+      localStorage.setItem("pendingOrderId", result.orderId);
+      localStorage.setItem("orderEmail", formData.email);
+
+      // Redirect to VNPay
+      window.location.href = result.paymentUrl;
+    } else {
+      throw new Error(result.error || "Failed to create payment URL");
+    }
+  } catch (error) {
+    console.error("Error placing order:", error);
+    showError("Error placing order: " + error.message);
+  } finally {
+    showLoading(false);
+  }
+}
+
+// Utility functions
+function isValidEmail(email) {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+}
+
+function isValidPhone(phone) {
+  const phoneRegex = /^[\d\s\-\+\(\)]{10,15}$/;
+  return phoneRegex.test(phone.replace(/\s/g, ""));
+}
+
+function showError(message) {
+  const errorElement = document.getElementById("order-error");
+  if (errorElement) {
+    errorElement.textContent = message;
+    errorElement.classList.remove("hidden");
+    errorElement.scrollIntoView({ behavior: "smooth", block: "center" });
+  } else {
+    alert(message);
+  }
+}
+
+function showLoading(show) {
+  const submitButton = document.querySelector('button[type="submit"]');
+  if (submitButton) {
+    submitButton.disabled = show;
+    submitButton.textContent = show ? "Processing..." : "Place Order";
+  }
+}
+
+function formatCurrency(amount) {
+  return (
+    new Intl.NumberFormat("vi-VN", {
+      style: "decimal",
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(amount || 0) + " VND"
+  );
+}
+
+// Handle payment return from VNPay
+function handlePaymentReturn() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const vnpResponseCode = urlParams.get("vnp_ResponseCode");
+  const vnpTransactionStatus = urlParams.get("vnp_TransactionStatus");
+  const orderId = urlParams.get("vnp_TxnRef");
+
+  if (vnpResponseCode === "00" && vnpTransactionStatus === "00") {
+    // Payment successful
+    alert("Payment successful! Your order has been placed.");
+    // Clear cart and redirect
+    localStorage.removeItem("cart");
+    localStorage.removeItem("pendingOrderId");
+    window.location.href = "/pages/customer/orders.html";
+  } else {
+    // Payment failed
+    alert("Payment failed. Please try again.");
+    window.location.href = "/pages/customer/cart.html";
+  }
+}
+
+// Check if this is a payment return page
+if (window.location.search.includes("vnp_ResponseCode")) {
+  handlePaymentReturn();
 }

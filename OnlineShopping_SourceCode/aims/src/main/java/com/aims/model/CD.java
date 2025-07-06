@@ -1,6 +1,8 @@
 package com.aims.model;
 
 import jakarta.persistence.*;
+
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Entity
@@ -24,8 +26,7 @@ public class CD {
     private String genre;
 
     @Column(name = "release_date")
-    @Temporal(TemporalType.DATE)
-    private Date releaseDate;
+    private LocalDateTime releaseDate;
 
     @OneToOne
     @MapsId
@@ -73,11 +74,11 @@ public class CD {
         this.genre = genre;
     }
 
-    public Date getReleaseDate() {
+    public LocalDateTime getReleaseDate() {
         return releaseDate;
     }
 
-    public void setReleaseDate(Date releaseDate) {
+    public void setReleaseDate(LocalDateTime releaseDate) {
         this.releaseDate = releaseDate;
     }
 

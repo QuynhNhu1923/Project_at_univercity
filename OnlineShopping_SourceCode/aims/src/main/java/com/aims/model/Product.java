@@ -1,13 +1,11 @@
-package com.aims.model; // Thay bằng package thực tế
+package com.aims.model;
 
 import jakarta.persistence.*;
-
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "products")
 public class Product {
-
     @Id
     @Column(name = "barcode", nullable = false)
     private String barcode;
@@ -28,7 +26,7 @@ public class Product {
     private int quantity;
 
     @Column(name = "warehouse_entry_date", nullable = false)
-    private Date warehouseEntryDate;
+    private LocalDateTime warehouseEntryDate;
 
     @Column(name = "dimensions")
     private String dimensions;
@@ -43,10 +41,10 @@ public class Product {
     private String condition;
 
     @Column(name = "created_at")
-    private Date createdAt;
+    private LocalDateTime createdAt;
 
     @Column(name = "updated_at")
-    private Date updatedAt;
+    private LocalDateTime updatedAt;
 
     @Column(name = "rush_delivery", nullable = false)
     private boolean rushDelivery;
@@ -55,7 +53,7 @@ public class Product {
     public Product() {}
 
     public Product(String barcode, String title, String category, double value, double price, int quantity,
-                   Date warehouseEntryDate, String dimensions, double weight, String description,
+                   LocalDateTime warehouseEntryDate, String dimensions, double weight, String description,
                    String condition, boolean rushDelivery) {
         this.barcode = barcode;
         this.title = title;
@@ -90,8 +88,8 @@ public class Product {
     public int getQuantity() { return quantity; }
     public void setQuantity(int quantity) { this.quantity = quantity; }
 
-    public Date getWarehouseEntryDate() { return warehouseEntryDate; }
-    public void setWarehouseEntryDate(Date warehouseEntryDate) { this.warehouseEntryDate = warehouseEntryDate; }
+    public LocalDateTime getWarehouseEntryDate() { return warehouseEntryDate; }
+    public void setWarehouseEntryDate(LocalDateTime warehouseEntryDate) { this.warehouseEntryDate = warehouseEntryDate; }
 
     public String getDimensions() { return dimensions; }
     public void setDimensions(String dimensions) { this.dimensions = dimensions; }
@@ -105,11 +103,11 @@ public class Product {
     public String getCondition() { return condition; }
     public void setCondition(String condition) { this.condition = condition; }
 
-    public Date getCreatedAt() { return createdAt; }
-    public void setCreatedAt(Date createdAt) { this.createdAt = createdAt; }
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 
-    public Date getUpdatedAt() { return updatedAt; }
-    public void setUpdatedAt(Date updatedAt) { this.updatedAt = updatedAt; }
+    public LocalDateTime getUpdatedAt() { return updatedAt; }
+    public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
 
     public boolean isRushDelivery() { return rushDelivery; }
     public void setRushDelivery(boolean rushDelivery) { this.rushDelivery = rushDelivery; }

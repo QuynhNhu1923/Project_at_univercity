@@ -9,16 +9,19 @@ import java.util.Objects;
 public class OrderItem {
 
     @Id
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id")
     private Order order;
 
     @Id
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_barcode")
     private Product product;
 
+    @Column(name = "quantity", nullable = false)
     private int quantity;
+
+    @Column(name = "price_at_order", nullable = false)
     private double priceAtOrder;
 
     // Constructor rỗng

@@ -2,13 +2,19 @@ package com.aims.util;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
+import jakarta.annotation.PostConstruct;
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Function;
 
 @Component
 public class JwtUtil {
@@ -16,58 +22,55 @@ public class JwtUtil {
     @Value("${jwt.secret}")
     private String jwtSecret;
 
-    private static final long EXPIRATION_TIME = 86400000; // 24 giờ
+    @Value("${jwt.expiration-ms}")
+    private long jwtExpirationMs;
 
-    // Chuyển secret string thành SecretKey để dùng với jjwt 0.12+
-    private SecretKey getSecretKey() {
-        return Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
+    private SecretKey signingKey;
+
+    @PostConstruct
+    public void init() {
+        byte[] keyBytes = jwtSecret.getBytes(StandardCharsets.UTF_8);
+        if (keyBytes.length < 64) {
+            throw new IllegalArgumentException("JWT secret key must be at least 64 bytes for HS512. " +
+                    "Current length: " + keyBytes.length + " bytes. Please update 'jwt.secret' in your configuration.");
+        }
+        this.signingKey = Keys.hmacShaKeyFor(keyBytes);
     }
 
-    // Tạo token JWT
-    public String generateToken(String email, String role) {
+    public String generateToken(UserDetails userDetails) {
+        Map<String, Object> claims = new HashMap<>();
         return Jwts.builder()
-                .subject(email)
-                .claim("role", role)
-                .issuedAt(new Date())
-                .expiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
-                .signWith(getSecretKey())
+                .setClaims(claims)
+                .setSubject(userDetails.getUsername())
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + jwtExpirationMs))
+                .signWith(signingKey, SignatureAlgorithm.HS512)
                 .compact();
     }
 
-    // Trích xuất email từ token
-    public String extractEmail(String token) {
-        return getClaims(token).getSubject();
+    public String extractUsername(String token) {
+        return extractClaim(token, Claims::getSubject);
     }
 
-    // Trích xuất vai trò từ token
-    public String extractRole(String token) {
-        return getClaims(token).get("role", String.class);
+    public Date extractExpiration(String token) {
+        return extractClaim(token, Claims::getExpiration);
     }
 
-    // Xác thực token
-    public boolean validateToken(String token) {
-        try {
-            Jwts.parser()
-                    .verifyWith(getSecretKey())
-                    .build()
-                    .parseSignedClaims(token);
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
-    // Lấy claims từ token
-    private Claims getClaims(String token) {
-        return Jwts.parser()
-                .verifyWith(getSecretKey())
+    public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
+        Claims claims = Jwts.parser()
+                .verifyWith(signingKey)
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
+        return claimsResolver.apply(claims);
     }
 
-    // Kiểm tra token có hết hạn không
-    public boolean isTokenExpired(String token) {
-        return getClaims(token).getExpiration().before(new Date());
+    public Boolean validateToken(String token, UserDetails userDetails) {
+        final String username = extractUsername(token);
+        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+    }
+
+    private Boolean isTokenExpired(String token) {
+        return extractExpiration(token).before(new Date());
     }
 }

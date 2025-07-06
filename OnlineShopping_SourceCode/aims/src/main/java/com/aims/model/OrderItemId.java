@@ -5,7 +5,7 @@ import java.util.Objects;
 
 public class OrderItemId implements Serializable {
 
-    private Long order; // orderId
+    private Integer order; // Changed from Long to Integer to match Order.orderId
     private String product; // productId (barcode)
 
     // Constructor rỗng
@@ -13,17 +13,17 @@ public class OrderItemId implements Serializable {
     }
 
     // Constructor đầy đủ
-    public OrderItemId(Long order, String product) {
+    public OrderItemId(Integer order, String product) {
         this.order = order;
         this.product = product;
     }
 
     // Getter và Setter
-    public Long getOrder() {
+    public Integer getOrder() {
         return order;
     }
 
-    public void setOrder(Long order) {
+    public void setOrder(Integer order) {
         this.order = order;
     }
 

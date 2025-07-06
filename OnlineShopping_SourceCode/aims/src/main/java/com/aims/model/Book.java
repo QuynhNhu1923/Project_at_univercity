@@ -1,6 +1,8 @@
 package com.aims.model;
 
 import jakarta.persistence.*;
+
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Entity
@@ -21,8 +23,7 @@ public class Book {
     private String publisher;
 
     @Column(name = "publication_date", nullable = false)
-    @Temporal(TemporalType.DATE)
-    private Date publicationDate;
+    private LocalDateTime publicationDate;
 
     @Column(name = "num_pages")
     private Integer numPages;
@@ -71,11 +72,11 @@ public class Book {
         this.publisher = publisher;
     }
 
-    public Date getPublicationDate() {
+    public LocalDateTime getPublicationDate() {
         return publicationDate;
     }
 
-    public void setPublicationDate(Date publicationDate) {
+    public void setPublicationDate(LocalDateTime publicationDate) {
         this.publicationDate = publicationDate;
     }
 
